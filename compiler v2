@@ -276,94 +276,7 @@
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
-
-    .btn-purple {
-      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-      color: white;
-      border: none;
-      transition: all 0.2s ease;
-    }
     
-    .btn-purple:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-    }
-    
-    .CodeMirror {
-      height: 100% !important;
-      font-family: 'Fira Code', monospace;
-      font-size: 16px;
-      line-height: 1.6;
-    }
-    
-    /* Tokyo Night theme (custom theme) */
-    .cm-s-tokyo-night.CodeMirror {
-      background-color: #1a1b26;
-      color: #a9b1d6;
-    }
-    
-    .cm-s-tokyo-night .CodeMirror-gutters {
-      background: #1a1b26;
-      border-right: 0;
-    }
-    
-    .cm-s-tokyo-night .CodeMirror-linenumber {
-      color: #565f89;
-    }
-    
-    .cm-s-tokyo-night .CodeMirror-cursor {
-      border-left: 1px solid #c0caf5;
-    }
-    
-    .cm-s-tokyo-night .cm-keyword { color: #9d7cd8; }
-    .cm-s-tokyo-night .cm-operator { color: #89ddff; }
-    .cm-s-tokyo-night .cm-variable { color: #c0caf5; }
-    .cm-s-tokyo-night .cm-variable-2 { color: #c0caf5; }
-    .cm-s-tokyo-night .cm-variable-3 { color: #c0caf5; }
-    .cm-s-tokyo-night .cm-builtin { color: #ff9e64; }
-    .cm-s-tokyo-night .cm-atom { color: #ff9e64; }
-    .cm-s-tokyo-night .cm-number { color: #ff9e64; }
-    .cm-s-tokyo-night .cm-def { color: #7aa2f7; }
-    .cm-s-tokyo-night .cm-string { color: #9ece6a; }
-    .cm-s-tokyo-night .cm-string-2 { color: #9ece6a; }
-    .cm-s-tokyo-night .cm-comment { color: #565f89; }
-    .cm-s-tokyo-night .cm-tag { color: #7aa2f7; }
-    .cm-s-tokyo-night .cm-attribute { color: #bb9af7; }
-    
-    /* Gruvbox Dark theme (custom theme) */
-    .cm-s-gruvbox-dark.CodeMirror {
-      background-color: #282828;
-      color: #ebdbb2;
-    }
-    
-    .cm-s-gruvbox-dark .CodeMirror-gutters {
-      background: #282828;
-      border-right: 0;
-    }
-    
-    .cm-s-gruvbox-dark .CodeMirror-linenumber {
-      color: #7c6f64;
-    }
-    
-    .cm-s-gruvbox-dark .CodeMirror-cursor {
-      border-left: 1px solid #ebdbb2;
-    }
-    
-    .cm-s-gruvbox-dark .cm-keyword { color: #fb4934; }
-    .cm-s-gruvbox-dark .cm-operator { color: #ebdbb2; }
-    .cm-s-gruvbox-dark .cm-variable { color: #ebdbb2; }
-    .cm-s-gruvbox-dark .cm-variable-2 { color: #83a598; }
-    .cm-s-gruvbox-dark .cm-variable-3 { color: #83a598; }
-    .cm-s-gruvbox-dark .cm-builtin { color: #fabd2f; }
-    .cm-s-gruvbox-dark .cm-atom { color: #d3869b; }
-    .cm-s-gruvbox-dark .cm-number { color: #d3869b; }
-    .cm-s-gruvbox-dark .cm-def { color: #83a598; }
-    .cm-s-gruvbox-dark .cm-string { color: #b8bb26; }
-    .cm-s-gruvbox-dark .cm-string-2 { color: #b8bb26; }
-    .cm-s-gruvbox-dark .cm-comment { color: #928374; }
-    .cm-s-gruvbox-dark .cm-tag { color: #83a598; }
-    .cm-s-gruvbox-dark .cm-attribute { color: #fabd2f; }
-
     .language-select {
       background: var(--dark);
       color: white;
@@ -584,19 +497,18 @@
       #editor-container, #terminal-container {
         width: 100% !important;
         height: auto !important;
-        min-height: 250px;
+        min-height: 300px;
       }
       #editor-terminal-container {
         flex-direction: column !important;
         height: auto !important;
-        gap: 0.5rem !important;
       }
       .resizer {
         display: none;
       }
       .tab-btn {
-        padding: 0.375rem 0.625rem !important;
-        font-size: 0.813rem;
+        padding: 0.5rem !important;
+        font-size: 0.875rem;
       }
       .settings-modal {
         width: 95% !important;
@@ -614,24 +526,16 @@
         bottom: 1rem !important;
         right: 1rem !important;
         padding: 0.5rem 1rem !important;
-        font-size: 0.875rem !important;
       }
       .exit-classroom-btn {
         top: 1rem !important;
         right: 1rem !important;
         padding: 0.25rem 0.75rem !important;
-        font-size: 0.813rem !important;
+        font-size: 0.875rem !important;
       }
-      /* Stack navigation buttons vertically on mobile */
-      .nav-buttons-container {
-        flex-direction: column;
-        width: 100%;
-        gap: 0.5rem;
-      }
-      .nav-buttons-row {
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
+      /* Improve nav button layout */
+      .flex.gap-2.flex-wrap {
+        justify-content: center;
       }
       /* Make settings panels scrollable */
       .tab-content {
@@ -640,14 +544,17 @@
       }
       /* Adjust previous outputs section */
       #previous-outputs-list {
-        max-height: 30vh;
+        max-height: 40vh;
       }
       /* Improve notes container */
       #notes-container {
-        height: 100px;
+        height: 120px;
       }
       #notes-container.collapsed {
         height: 38px;
+      }
+      .container {
+        transform: none;
       }
       /* Make mobile touch-friendly */
       button, select, .tab-btn, .language-select {
@@ -658,11 +565,6 @@
       .slider::-webkit-slider-thumb {
         width: 24px;
         height: 24px;
-      }
-      /* Improve button text spacing */
-      .btn-primary, .btn-secondary, .btn-info, .btn-danger, .btn-purple {
-        width: 100%;
-        justify-content: center;
       }
     }
 
@@ -694,42 +596,6 @@
       .notes-header h3, .previous-output-header h3 {
         font-size: 0.75rem;
       }
-      /* Enhanced mobile touch support */
-      .button, .tab-btn, select, input[type="checkbox"] {
-        min-height: 48px;
-        min-width: 48px;
-      }
-      
-      /* Improve touch feedback */
-      button:active, .tab-btn:active {
-        transform: scale(0.96);
-        transition: transform 0.1s;
-      }
-      
-      /* Optimize file tabs for mobile */
-      .file-tab {
-        padding: 0.5rem 0.75rem !important;
-      }
-      
-      /* Expand terminal area for better visibility on small screens */
-      #terminal-container {
-        min-height: 200px;
-      }
-      
-      /* Optimize terminal header for touch */
-      .terminal-header {
-        padding: 0.75rem !important;
-      }
-      
-      /* Stack buttons more effectively */
-      .nav-buttons-row {
-        gap: 0.375rem;
-      }
-      
-      /* Increase font size for better readability */
-      #terminal-output, #notes-editor {
-        font-size: 16px !important;
-      }
     }
   </style>
 <style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0px}.z-10{z-index:10}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-12{margin-bottom:3rem}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.ml-2{margin-left:0.5rem}.mr-2{margin-right:0.5rem}.mr-3{margin-right:0.75rem}.mt-1{margin-top:0.25rem}.mt-12{margin-top:3rem}.mt-2{margin-top:0.5rem}.mt-3{margin-top:0.75rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.block{display:block}.flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.hidden{display:none}.h-10{height:2.5rem}.h-12{height:3rem}.h-5{height:1.25rem}.h-full{height:100%}.h-screen{height:100vh}.max-h-60{max-height:15rem}.max-h-64{max-height:16rem}.w-10{width:2.5rem}.w-12{width:3rem}.w-5{width:1.25rem}.w-full{width:100%}.max-w-4xl{max-width:56rem}.max-w-6xl{max-width:72rem}.max-w-lg{max-width:32rem}.flex-1{flex:1 1 0%}@keyframes spin{to{transform:rotate(360deg)}}.animate-spin{animation:spin 1s linear infinite}.cursor-pointer{cursor:pointer}.resize-none{resize:none}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1{gap:0.25rem}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.gap-8{gap:2rem}.space-x-6 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(1.5rem * var(--tw-space-x-reverse));margin-left:calc(1.5rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.overflow-auto{overflow:auto}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.overflow-y-auto{overflow-y:auto}.rounded{border-radius:0.25rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-b-lg{border-bottom-right-radius:0.5rem;border-bottom-left-radius:0.5rem}.rounded-l-lg{border-top-left-radius:0.5rem;border-bottom-left-radius:0.5rem}.rounded-t{border-top-left-radius:0.25rem;border-top-right-radius:0.25rem}.rounded-t-lg{border-top-left-radius:0.5rem;border-top-right-radius:0.5rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-b-2{border-bottom-width:2px}.border-t-0{border-top-width:0px}.border-t-2{border-top-width:2px}.border-none{border-style:none}.bg-black{--tw-bg-opacity:1;background-color:rgb(0 0 0 / var(--tw-bg-opacity, 1))}.bg-blue-500{--tw-bg-opacity:1;background-color:rgb(59 130 246 / var(--tw-bg-opacity, 1))}.bg-blue-600{--tw-bg-opacity:1;background-color:rgb(37 99 235 / var(--tw-bg-opacity, 1))}.bg-blue-800{--tw-bg-opacity:1;background-color:rgb(30 64 175 / var(--tw-bg-opacity, 1))}.bg-green-600{--tw-bg-opacity:1;background-color:rgb(22 163 74 / var(--tw-bg-opacity, 1))}.bg-purple-600{--tw-bg-opacity:1;background-color:rgb(147 51 234 / var(--tw-bg-opacity, 1))}.bg-opacity-50{--tw-bg-opacity:0.5}.bg-opacity-75{--tw-bg-opacity:0.75}.bg-gradient-to-b{background-image:linear-gradient(to bottom, var(--tw-gradient-stops))}.p-2{padding:0.5rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.p-8{padding:2rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-8{padding-left:2rem;padding-right:2rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-12{padding-top:3rem;padding-bottom:3rem}.py-16{padding-top:4rem;padding-bottom:4rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.text-left{text-align:left}.text-center{text-align:center}.text-right{text-align:right}.font-mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-5xl{font-size:3rem;line-height:1}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-semibold{font-weight:600}.text-gray-200{--tw-text-opacity:1;color:rgb(229 231 235 / var(--tw-text-opacity, 1))}.text-gray-300{--tw-text-opacity:1;color:rgb(209 213 219 / var(--tw-text-opacity, 1))}.text-gray-400{--tw-text-opacity:1;color:rgb(156 163 175 / var(--tw-text-opacity, 1))}.text-purple-500{--tw-text-opacity:1;color:rgb(168 85 247 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:bg-blue-600:hover{--tw-bg-opacity:1;background-color:rgb(37 99 235 / var(--tw-bg-opacity, 1))}.hover\:bg-blue-700:hover{--tw-bg-opacity:1;background-color:rgb(29 78 216 / var(--tw-bg-opacity, 1))}.hover\:bg-blue-900:hover{--tw-bg-opacity:1;background-color:rgb(30 58 138 / var(--tw-bg-opacity, 1))}.hover\:bg-green-700:hover{--tw-bg-opacity:1;background-color:rgb(21 128 61 / var(--tw-bg-opacity, 1))}.hover\:bg-purple-700:hover{--tw-bg-opacity:1;background-color:rgb(126 34 206 / var(--tw-bg-opacity, 1))}.hover\:text-red-400:hover{--tw-text-opacity:1;color:rgb(248 113 113 / var(--tw-text-opacity, 1))}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.hover\:shadow-xl:hover{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}@media (min-width: 640px){.sm\:inline{display:inline}}@media (min-width: 768px){.md\:flex{display:flex}.md\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.md\:text-2xl{font-size:1.5rem;line-height:2rem}.md\:text-4xl{font-size:2.25rem;line-height:2.5rem}.md\:text-6xl{font-size:3.75rem;line-height:1}}</style></head>
@@ -758,7 +624,11 @@
               </div>
             </div>
             <div class="console">
-              <pre><code id="welcome-code">puts "Welcome to Codeer.org! Write your code here." # Ruby</code></pre>
+              <pre><code id="welcome-code">class Program {
+    static void Main() {
+        System.Console.WriteLine("Welcome to Codeer.org! Write your code here.");
+    }
+} // C#</code></pre>
             </div>
           </div>
         </div>
@@ -880,49 +750,40 @@
     <!-- Top Navigation Bar -->
     <div class="flex flex-wrap items-center justify-between mb-4 gap-2 bg-darker p-3 rounded-lg shadow-lg">
       <div class="flex items-center gap-2">
-        <div class="flex items-center">
-          <i class="fas fa-code text-primary mr-2"></i>
-          <span class="text-xl font-bold text-white">codeer<span class="text-primary">.org</span></span>
-        </div>
-        <select id="language-select" class="language-select ml-4">
-          <!-- Populated dynamically -->
-        </select>
+        <select id="language-select" class="language-select"><option value="45">Assembly (NASM 2.14.02)</option><option value="46">Bash (5.0.0)</option><option value="47">Basic (FBC 1.07.1)</option><option value="75">C (Clang 7.0.1)</option><option value="76">C++ (Clang 7.0.1)</option><option value="48">C (GCC 7.4.0)</option><option value="52">C++ (GCC 7.4.0)</option><option value="49">C (GCC 8.3.0)</option><option value="53">C++ (GCC 8.3.0)</option><option value="50">C (GCC 9.2.0)</option><option value="54">C++ (GCC 9.2.0)</option><option value="86">Clojure (1.10.1)</option><option value="51">C# (Mono 6.6.0.161)</option><option value="77">COBOL (GnuCOBOL 2.2)</option><option value="55">Common Lisp (SBCL 2.0.0)</option><option value="56">D (DMD 2.089.1)</option><option value="57">Elixir (1.9.4)</option><option value="58">Erlang (OTP 22.2)</option><option value="44">Executable</option><option value="87">F# (.NET Core SDK 3.1.202)</option><option value="59">Fortran (GFortran 9.2.0)</option><option value="60">Go (1.13.5)</option><option value="88">Groovy (3.0.3)</option><option value="61">Haskell (GHC 8.8.1)</option><option value="62">Java (OpenJDK 13.0.1)</option><option value="63">JavaScript (Node.js 12.14.0)</option><option value="78">Kotlin (1.3.70)</option><option value="64">Lua (5.3.5)</option><option value="89">Multi-file program</option><option value="79">Objective-C (Clang 7.0.1)</option><option value="65">OCaml (4.09.0)</option><option value="66">Octave (5.1.0)</option><option value="67">Pascal (FPC 3.0.4)</option><option value="85">Perl (5.28.1)</option><option value="68">PHP (7.4.1)</option><option value="43">Plain Text</option><option value="69">Prolog (GNU Prolog 1.4.5)</option><option value="70">Python (2.7.17)</option><option value="71">Python (3.8.1)</option><option value="80">R (4.0.0)</option><option value="72">Ruby (2.7.0)</option><option value="73">Rust (1.40.0)</option><option value="81">Scala (2.13.2)</option><option value="82">SQL (SQLite 3.27.2)</option><option value="83">Swift (5.2.3)</option><option value="74">TypeScript (3.7.4)</option><option value="84">Visual Basic.Net (vbnc 0.0.0.5943)</option></select>
         
         <!-- File tabs system -->
         <div class="hidden md:flex items-center bg-dark rounded-lg ml-2 overflow-x-auto max-w-lg">
-          <div id="file-tabs" class="flex">
-            <!-- File tabs go here -->
-          </div>
-          <button id="new-file-btn" class="text-primary hover:text-white ml-1 px-2 py-1" title="New File">
+          <div id="file-tabs" class="flex"><div class="file-tab active bg-primary px-3 py-2 text-sm flex items-center gap-1 cursor-pointer">
+          <i class="fab fa-python text-white"></i>
+          <span>main.py</span>
+          <i class="fas fa-times ml-2 text-xs hover:text-red-400" data-filename="main"></i>
+        </div></div>
+          <button id="new-file-btn" class="px-3 py-2 text-gray-400 hover:text-white" title="New File">
             <i class="fas fa-plus"></i>
           </button>
         </div>
       </div>
       
-      <!-- Mobile-optimized button layout -->
-      <div class="nav-buttons-container flex items-center gap-2 flex-wrap">
-        <div class="nav-buttons-row flex gap-2 w-full md:w-auto">
-          <button id="run-btn" class="btn-primary py-2 px-4 rounded-lg flex items-center justify-center" title="Run Code">
-            <i class="fas fa-play mr-2"></i> <span class="hidden sm:inline">Run</span>
-          </button>
-          <button id="copy-btn" class="btn-secondary py-2 px-4 rounded-lg flex items-center justify-center" title="Copy Code">
-            <i class="fas fa-copy mr-2"></i> <span class="hidden sm:inline">Copy</span>
-          </button>
-          <button id="delete-btn" class="btn-danger py-2 px-4 rounded-lg flex items-center justify-center" title="Clear Code">
-            <i class="fas fa-trash-alt mr-2"></i> <span class="hidden sm:inline">Clear</span>
-          </button>
-        </div>
-        <div class="nav-buttons-row flex gap-2 w-full md:w-auto">
-          <button id="download-btn" class="btn-info py-2 px-4 rounded-lg flex items-center justify-center" title="Download Code">
-            <i class="fas fa-download mr-2"></i> <span class="hidden sm:inline">Download</span>
-          </button>
-          <button id="share-btn" class="btn-purple py-2 px-4 rounded-lg flex items-center justify-center" title="Share Code">
-            <i class="fas fa-share-alt mr-2"></i> <span class="hidden sm:inline">Share</span>
-          </button>
-          <button id="settings-btn" class="btn-secondary py-2 px-4 rounded-lg flex items-center justify-center" title="Settings">
-            <i class="fas fa-cog mr-2"></i> <span class="hidden sm:inline">Settings</span>
-          </button>
-        </div>
+      <div class="flex gap-2 flex-wrap">
+        <button id="run-btn" class="btn-primary py-2 px-4 rounded-lg flex items-center shadow-lg hover:shadow-xl" title="Run Code (Ctrl+Enter)">
+          <i class="fas fa-play mr-2"></i> Run
+        </button>
+        <button id="copy-btn" class="btn-secondary py-2 px-4 rounded-lg flex items-center" title="Copy Code">
+          <i class="fas fa-copy mr-2"></i> <span class="hidden sm:inline">Copy</span>
+        </button>
+        <button id="delete-btn" class="btn-danger py-2 px-4 rounded-lg flex items-center" title="Delete Code">
+          <i class="fas fa-trash mr-2"></i> <span class="hidden sm:inline">Clear</span>
+        </button>
+        <button id="download-btn" class="btn-info py-2 px-4 rounded-lg flex items-center" title="Download Code">
+          <i class="fas fa-download mr-2"></i> <span class="hidden sm:inline">Save</span>
+        </button>
+        <button id="share-btn" class="btn-secondary bg-purple-600 hover:bg-purple-700 py-2 px-4 rounded-lg flex items-center" title="Share Code">
+          <i class="fas fa-share-alt mr-2"></i> <span class="hidden sm:inline">Share</span>
+        </button>
+        <button id="settings-btn" class="btn-secondary py-2 px-4 rounded-lg flex items-center" title="Settings">
+          <i class="fas fa-cog mr-2"></i> <span class="hidden sm:inline">Settings</span>
+        </button>
       </div>
     </div>
     
@@ -932,7 +793,7 @@
         <div id="editor-loading" class="absolute inset-0 bg-darker bg-opacity-75 flex items-center justify-center z-10 hidden">
           <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
         </div>
-        <textarea id="code-editor" style="display: none;"></textarea><div class="CodeMirror cm-s-dracula CodeMirror-wrap" translate="no"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 8px; left: 190.25px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; min-height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" tabindex="-1" cm-not-content="true" style="bottom: 0px;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-hscrollbar" tabindex="-1" cm-not-content="true"><div style="height: 100%; min-height: 1px; width: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 29px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 50px; min-height: 178px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors" style=""><div class="CodeMirror-cursor" style="left: 161.25px; top: 0px; height: 19.5px;">&nbsp;</div></div><div class="CodeMirror-code" role="presentation"><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" aria-hidden="true" style="left: -29px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">1</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-builtin">print</span>(<span class="cm-string">"Hello, world!"</span>)</span></pre></div></div></div></div></div></div><div style="position: absolute; height: 50px; width: 1px; border-bottom: 0px solid transparent; top: 178px;"></div><div class="CodeMirror-gutters" style="left: 1.9e-06px; height: 228px;"><div class="CodeMirror-gutter CodeMirror-linenumbers" style="width: 29px;"></div></div></div></div>
+        <textarea id="code-editor" style="display: none;"></textarea><div class="CodeMirror cm-s-solarized-dark CodeMirror-wrap" translate="no"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 8px; left: 34px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; min-height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" tabindex="-1" cm-not-content="true" style="bottom: 0px;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-hscrollbar" tabindex="-1" cm-not-content="true"><div style="height: 100%; min-height: 1px; width: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 30px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 50px; min-height: 178px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"><div class="CodeMirror-cursor" style="left: 4px; top: 0px; height: 19.5px;">&nbsp;</div></div><div class="CodeMirror-code" role="presentation"><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" aria-hidden="true" style="left: -30px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">1</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-builtin">print</span>(<span class="cm-string">"Hello, world!"</span>)</span></pre></div></div></div></div></div></div><div style="position: absolute; height: 50px; width: 1px; border-bottom: 0px solid transparent; top: 178px;"></div><div class="CodeMirror-gutters" style="left: 1.9e-06px; height: 228px;"><div class="CodeMirror-gutter CodeMirror-linenumbers" style="width: 29px;"></div></div></div></div>
       </div>
       <div class="resizer" id="resizer"></div>
       <div id="terminal-container" class="flex-1 relative h-full rounded-lg overflow-hidden shadow-xl flex flex-col">
@@ -1065,7 +926,7 @@
           <label class="block text-gray-300 mb-2">Line Numbers</label>
           <div class="flex items-center">
             <label class="inline-flex items-center">
-              <input type="checkbox" id="line-numbers" checked class="form-checkbox h-5 w-5 text-primary bg-dark border-dark-gray rounded">
+              <input type="checkbox" id="line-numbers" checked="" class="form-checkbox h-5 w-5 text-primary bg-dark border-dark-gray rounded">
               <span class="ml-2 text-gray-300">Show line numbers</span>
             </label>
           </div>
@@ -1074,7 +935,7 @@
           <label class="block text-gray-300 mb-2">Word Wrap</label>
           <div class="flex items-center">
             <label class="inline-flex items-center">
-              <input type="checkbox" id="word-wrap" checked class="form-checkbox h-5 w-5 text-primary bg-dark border-dark-gray rounded">
+              <input type="checkbox" id="word-wrap" checked="" class="form-checkbox h-5 w-5 text-primary bg-dark border-dark-gray rounded">
               <span class="ml-2 text-gray-300">Enable word wrap</span>
             </label>
           </div>
@@ -1289,7 +1150,7 @@
         const modeMap = {
           71: 'python', // Python
           63: 'javascript', // JavaScript
-           62: 'text/x-java', // Java
+          62: 'text/x-java', // Java
           50: 'text/x-csrc', // C
           54: 'text/x-c++src', // C++
           86: 'ruby', // Ruby
@@ -2130,19 +1991,19 @@
       // Update the terminal output area
       const terminalOutput = document.getElementById('terminal-output');
       if (terminalOutput) {
-        terminalOutput.style.background = bgColors[theme] || '#1a1a1a';
+        terminalOutput.style.background = bgColors[theme] || '#1a202c';
       }
       
       // Update the notes editor area
       const notesEditor = document.getElementById('notes-editor');
       if (notesEditor) {
-        notesEditor.style.background = bgColors[theme] || '#1a1a1a';
+        notesEditor.style.background = bgColors[theme] || '#1a202c';
         notesEditor.style.color = themeColor.primary;
       }
       
       // Update dropdowns
       document.querySelectorAll('.language-select').forEach(el => {
-        el.style.background = bgColors[theme] || '#1a1a1a';
+        el.style.background = bgColors[theme] || '#1a202c';
         el.style.borderColor = themeColor.primary + '50';
       });
       
