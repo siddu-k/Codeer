@@ -1,0 +1,2491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codeer.org - Online Compiler</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
+  <!-- CodeMirror Language Modes -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/clike/clike.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/ruby/ruby.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/php/php.min.js"></script>
+  <!-- Additional Modes for C#, Kotlin (basic support) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/clike/clike.min.js" data-mode="csharp"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/clike/clike.min.js" data-mode="kotlin"></script>
+  <!-- CodeMirror Themes -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/monokai.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/dracula.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/solarized.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/nord.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/cobalt.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/blackboard.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/mdn-like.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #10b981;
+      --primary-dark: #059669;
+      --primary-light: #a7f3d0;
+      --dark: #1e293b;
+      --darker: #0f172a;
+      --light: #f8fafc;
+      --gray: #94a3b8;
+      --dark-gray: #334155;
+    }
+    
+    body {
+      margin: 0;
+      font-family: 'Fira Code', monospace;
+      background: linear-gradient(135deg, var(--darker), var(--dark));
+      color: var(--light);
+      overflow-x: hidden;
+      height: 100vh;
+    }
+    
+    #landing-page, #compiler-page {
+      min-height: 100vh;
+    }
+    
+    .glass-card {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .glass-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      margin-bottom: 1rem;
+    }
+    
+    #editor-container, #terminal-container {
+      background: var(--dark);
+      border: 1px solid var(--dark-gray);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    #editor-terminal-container {
+      height: calc(100vh - 265px);
+      min-height: 300px;
+    }
+    
+    /* Notes section styles */
+    #notes-container {
+      margin-top: 12px;
+      background: var(--dark);
+      border: 1px solid var(--dark-gray);
+      border-radius: 12px;
+      overflow: hidden;
+      height: 150px;
+      position: relative;
+      transition: height 0.3s ease;
+    }
+    
+    #notes-container.collapsed {
+      height: 38px;
+    }
+    
+    .notes-header {
+      background-color: var(--dark-gray);
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+    
+    .notes-header h3 {
+      margin: 0;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      color: var(--primary-light);
+    }
+    
+    .notes-header h3 i {
+      margin-right: 8px;
+    }
+    
+    .notes-content {
+      padding: 0;
+      height: calc(100% - 38px);
+    }
+    
+    #notes-editor {
+      width: 100%;
+      height: 100%;
+      background: var(--darker);
+      color: #e06c75;
+      padding: 8px;
+      border: none;
+      resize: none;
+      font-family: 'Fira Code', monospace;
+      outline: none;
+      font-size: 14px;
+    }
+    
+    .resizer {
+      background: var(--dark-gray);
+      cursor: col-resize;
+      width: 8px;
+      transition: background 0.2s;
+      border-radius: 4px;
+    }
+    
+    .resizer:hover {
+      background: var(--primary);
+    }
+    
+    .floating-terminal {
+      position: absolute;
+      background: var(--dark);
+      border: 1px solid var(--dark-gray);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      resize: both;
+      overflow: auto;
+      min-width: 300px;
+      min-height: 200px;
+      z-index: 10;
+    }
+    
+    .settings-modal {
+      background: var(--dark);
+      border-radius: 12px;
+      border: 1px solid var(--dark-gray);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 90%;
+    }
+    
+    .tab-btn {
+      transition: all 0.2s ease;
+    }
+    
+    .tab-btn.active {
+      background-color: var(--primary) !important;
+    }
+    
+    .cm-editor {
+      height: 100%;
+      border-radius: 12px;
+    }
+    
+    /* Add line indentation guides */
+    .cm-lineIndent {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background-color: rgba(255, 255, 255, 0.05);
+      position: absolute;
+    }
+    
+    /* Add more padding at the bottom of editor for better visibility */
+    .CodeMirror-lines {
+      padding: 8px 0 150px 0; /* Extra bottom padding to allow scrolling beyond the last line */
+    }
+    
+    /* Highlight the active line more visibly */
+    .CodeMirror-activeline-background {
+      background: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    /* Improve scrollbar styling */
+    .CodeMirror-vscrollbar::-webkit-scrollbar {
+      width: 10px;
+    }
+    
+    .CodeMirror-vscrollbar::-webkit-scrollbar-track {
+      background: var(--dark);
+      border-radius: 8px;
+    }
+    
+    .CodeMirror-vscrollbar::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 8px;
+      border: 2px solid var(--dark);
+    }
+    
+    #compiler-page {
+      height: 100%;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      border: none;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    
+    .btn-secondary {
+      background: var(--dark-gray);
+      color: white;
+      border: none;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-secondary:hover {
+      background: var(--gray);
+      transform: translateY(-2px);
+    }
+    
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      border: none;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+    
+    .btn-info {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      border: none;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-info:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    
+    .language-select {
+      background: var(--dark);
+      color: white;
+      border: 1px solid var(--dark-gray);
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1rem;
+    }
+    
+    .language-select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    
+    .slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: var(--dark-gray);
+      outline: none;
+    }
+    
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .slider::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+    }
+    
+    .window {
+      position: relative;
+      height: 200px;
+      width: 300px;
+      background-color: var(--dark);
+      border: 2px solid var(--dark-gray);
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    
+    .window-title {
+      height: 30px;
+      background-color: var(--dark-gray);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+    }
+    
+    .window-title p {
+      color: var(--light);
+      font-weight: bold;
+      margin: 0;
+      text-align: left;
+    }
+    
+    .window-buttons {
+      display: flex;
+      align-items: center;
+    }
+    
+    .window-button {
+      width: 12px;
+      height: 12px;
+      border-radius: 6px;
+      margin: 5px;
+      transition: all 0.2s ease;
+    }
+    
+    .window-button.close {
+      background-color: #f56565;
+    }
+    
+    .window-button.close:hover {
+      background-color: #c53030;
+      cursor: pointer;
+    }
+    
+    .window-button.reduce {
+      background-color: #ecc94b;
+    }
+    
+    .window-button.reduce:hover {
+      background-color: #b7791f;
+      cursor: pointer;
+    }
+    
+    .window-button.fullscreen {
+      background-color: var(--primary);
+    }
+    
+    .window-button.fullscreen:hover {
+      background-color: var(--primary-dark);
+      cursor: pointer;
+    }
+    
+    .console {
+      width: 100%;
+      height: calc(100% - 30px);
+      background-color: var(--darker);
+      color: var(--light);
+      overflow: auto;
+      padding: 1rem;
+    }
+    
+    .console pre {
+      margin: 0;
+      font-size: 14px;
+    }
+    
+    .console pre code {
+      color: var(--primary-light);
+      outline: none;
+    }
+    
+    .console::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .console::-webkit-scrollbar-track {
+      background-color: var(--dark-gray);
+    }
+    
+    .console::-webkit-scrollbar-thumb {
+      background-color: var(--primary);
+      border-radius: 10px;
+      border: 2px solid var(--dark-gray);
+    }
+    
+    .console::-webkit-scrollbar-thumb:hover {
+      background-color: var(--primary-dark);
+    }
+    
+    .hero-gradient {
+      background: linear-gradient(135deg, var(--darker), var(--dark), var(--primary-dark));
+      background-size: 200% 200%;
+      animation: gradient 8s ease infinite;
+    }
+    
+    @keyframes gradient {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+    
+    .typewriter {
+      overflow: hidden;
+      border-right: 2px solid var(--primary);
+      white-space: nowrap;
+      margin: 0 auto;
+      letter-spacing: 0.15em;
+      animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+    }
+    
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+    
+    @keyframes blink-caret {
+      from, to { border-color: transparent }
+      50% { border-color: var(--primary) }
+    }
+    
+    .floating {
+      animation: floating 6s ease-in-out infinite;
+    }
+    
+    @keyframes floating {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      }
+      70% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+      }
+    }
+    
+    @media (max-width: 768px) {
+      #editor-container, #terminal-container {
+        width: 100% !important;
+        height: auto !important;
+        min-height: 300px;
+      }
+      #editor-terminal-container {
+        flex-direction: column !important;
+        height: auto !important;
+      }
+      .resizer {
+        display: none;
+      }
+      .tab-btn {
+        padding: 0.5rem !important;
+        font-size: 0.875rem;
+      }
+      .settings-modal {
+        width: 95% !important;
+        padding: 0.75rem !important;
+      }
+      #compiler-page {
+        padding: 0.5rem !important;
+      }
+      .floating-terminal {
+        width: 90% !important;
+        left: 5% !important;
+        height: 40% !important;
+      }
+      .fixed-run-btn {
+        bottom: 1rem !important;
+        right: 1rem !important;
+        padding: 0.5rem 1rem !important;
+      }
+      .exit-classroom-btn {
+        top: 1rem !important;
+        right: 1rem !important;
+        padding: 0.25rem 0.75rem !important;
+        font-size: 0.875rem !important;
+      }
+      /* Improve nav button layout */
+      .flex.gap-2.flex-wrap {
+        justify-content: center;
+      }
+      /* Make settings panels scrollable */
+      .tab-content {
+        max-height: 70vh;
+        overflow-y: auto;
+      }
+      /* Adjust previous outputs section */
+      #previous-outputs-list {
+        max-height: 40vh;
+      }
+      /* Improve notes container */
+      #notes-container {
+        height: 120px;
+      }
+      #notes-container.collapsed {
+        height: 38px;
+      }
+      .container {
+        transform: none;
+      }
+      /* Make mobile touch-friendly */
+      button, select, .tab-btn, .language-select {
+        min-height: 44px;
+        min-width: 44px;
+      }
+      /* Make slider thumbs larger for touch */
+      .slider::-webkit-slider-thumb {
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    /* Additional media query for very small screens */
+    @media (max-width: 480px) {
+      #editor-terminal-container {
+        gap: 0.5rem !important;
+      }
+      .btn-primary, .btn-secondary, .btn-info, .btn-danger {
+        padding: 0.375rem 0.75rem !important;
+        font-size: 0.875rem !important;
+      }
+      .glass-card {
+        padding: 1rem !important;
+      }
+      h1 {
+        font-size: 1.75rem !important;
+      }
+      h2 {
+        font-size: 1.5rem !important;
+      }
+      h3 {
+        font-size: 1.25rem !important;
+      }
+      .feature-icon {
+        width: 36px;
+        height: 36px;
+      }
+      .notes-header h3, .previous-output-header h3 {
+        font-size: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Landing Page -->
+  <div id="landing-page" class="flex flex-col">
+    <!-- Hero Section -->
+    <section class="text-center py-16 px-4 hero-gradient">
+      <div class="max-w-4xl mx-auto">
+        <div class="flex justify-center mb-6">
+          <div class="glass-card p-4">
+            <i class="fas fa-code text-3xl text-white"></i>
+          </div>
+        </div>
+        <h1 class="text-5xl md:text-6xl font-bold text-white mb-4">Codeer.org</h1>
+        <p class="text-xl md:text-2xl text-gray-200 mb-8">The ultimate free compiler for developers and students</p>
+        
+        <div class="container">
+          <div class="window floating">
+            <div class="window-title">
+              <p>Console Window</p>
+              <div class="window-buttons">
+                <div class="window-button fullscreen"></div>
+                <div class="window-button reduce"></div>
+                <div class="window-button close"></div>
+              </div>
+            </div>
+            <div class="console">
+              <pre><code id="welcome-code"></code></pre>
+            </div>
+          </div>
+        </div>
+        
+        <button id="start-coding" class="mt-12 btn-primary py-3 px-8 rounded-lg text-lg font-semibold pulse">
+          <i class="fas fa-play mr-2"></i> Start Coding Now
+        </button>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-16 px-4">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold text-center text-white mb-12">Why Choose Codeer.org?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="glass-card p-6">
+            <div class="feature-icon">
+              <i class="fas fa-language text-xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-2">Multi-Language Support</h3>
+            <p class="text-gray-300">Compile code in Python, JavaScript, Java, and more with Judge0 API.</p>
+          </div>
+          <div class="glass-card p-6">
+            <div class="feature-icon">
+              <i class="fas fa-expand-alt text-xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-2">Resizable Interface</h3>
+            <p class="text-gray-300">Drag borders to customize your coding and terminal areas.</p>
+          </div>
+          <div class="glass-card p-6">
+            <div class="feature-icon">
+              <i class="fas fa-palette text-xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-2">Personalized UI</h3>
+            <p class="text-gray-300">Adjust UI size, font, and pick from 9+ stunning themes.</p>
+          </div>
+          <div class="glass-card p-6">
+            <div class="feature-icon">
+              <i class="fas fa-chalkboard-teacher text-xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-2">Classroom Mode</h3>
+            <p class="text-gray-300">Full-screen coding with a floating, resizable terminal.</p>
+          </div>
+          <div class="glass-card p-6">
+            <div class="feature-icon">
+              <i class="fas fa-code-branch text-xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-2">Code Management</h3>
+            <p class="text-gray-300">Easily copy, delete, download, or run your code.</p>
+          </div>
+          <div class="glass-card p-6">
+            <div class="feature-icon">
+              <i class="fas fa-gift text-xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-2">Completely Free</h3>
+            <p class="text-gray-300">Access all features at no cost, forever.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Free Offerings Section -->
+    <section class="py-16 px-4 bg-gradient-to-b from-dark to-darker">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold text-center text-white mb-8">What You Get for Free</h2>
+        <div class="glass-card p-8">
+          <ul class="space-y-4 text-gray-300 text-lg">
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-primary mr-3 mt-1"></i>
+              <span>Unlimited code compilation across all supported languages</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-primary mr-3 mt-1"></i>
+              <span>Access to 9+ editor themes and customizable layouts</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-primary mr-3 mt-1"></i>
+              <span>Resizable coding and terminal areas, plus classroom view mode</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-primary mr-3 mt-1"></i>
+              <span>Seamless code copy, delete, and download functionalities</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 text-center bg-darker">
+      <div class="max-w-6xl mx-auto">
+        <div class="flex justify-center space-x-6 mb-6">
+          <a href="#" class="text-gray-400 hover:text-primary transition">
+            <i class="fab fa-github text-2xl"></i>
+          </a>
+          <a href="#" class="text-gray-400 hover:text-primary transition">
+            <i class="fab fa-twitter text-2xl"></i>
+          </a>
+          <a href="#" class="text-gray-400 hover:text-primary transition">
+            <i class="fab fa-discord text-2xl"></i>
+          </a>
+          <a href="#" class="text-gray-400 hover:text-primary transition">
+            <i class="fab fa-linkedin text-2xl"></i>
+          </a>
+        </div>
+        <p class="text-gray-400 mb-4">© 2025 Codeer.org. All rights reserved.</p>
+        <div class="flex justify-center space-x-6">
+          <a href="#" class="text-gray-400 hover:text-primary transition">About</a>
+          <a href="#" class="text-gray-400 hover:text-primary transition">Contact</a>
+          <a href="#" class="text-gray-400 hover:text-primary transition">Privacy Policy</a>
+          <a href="#" class="text-gray-400 hover:text-primary transition">Terms</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Compiler Page -->
+  <div id="compiler-page" class="hidden flex flex-col h-screen p-4">
+    <!-- Top Navigation Bar -->
+    <div class="flex flex-wrap items-center justify-between mb-4 gap-2 bg-darker p-3 rounded-lg shadow-lg">
+      <div class="flex items-center gap-2">
+        <select id="language-select" class="language-select">
+          <!-- Populated dynamically -->
+        </select>
+        
+        <!-- File tabs system -->
+        <div class="hidden md:flex items-center bg-dark rounded-lg ml-2 overflow-x-auto max-w-lg">
+          <div id="file-tabs" class="flex">
+            <div class="file-tab active px-3 py-2 text-sm flex items-center gap-1 cursor-pointer hover:bg-dark-gray rounded-l-lg">
+              <i class="fas fa-code text-primary"></i>
+              <span>main</span>
+              <i class="fas fa-times ml-2 text-xs hover:text-red-400"></i>
+            </div>
+          </div>
+          <button id="new-file-btn" class="px-3 py-2 text-gray-400 hover:text-white" title="New File">
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="flex gap-2 flex-wrap">
+        <button id="run-btn" class="btn-primary py-2 px-4 rounded-lg flex items-center shadow-lg hover:shadow-xl" title="Run Code (Ctrl+Enter)">
+          <i class="fas fa-play mr-2"></i> Run
+        </button>
+        <button id="copy-btn" class="btn-secondary py-2 px-4 rounded-lg flex items-center" title="Copy Code">
+          <i class="fas fa-copy mr-2"></i> <span class="hidden sm:inline">Copy</span>
+        </button>
+        <button id="delete-btn" class="btn-danger py-2 px-4 rounded-lg flex items-center" title="Delete Code">
+          <i class="fas fa-trash mr-2"></i> <span class="hidden sm:inline">Clear</span>
+        </button>
+        <button id="download-btn" class="btn-info py-2 px-4 rounded-lg flex items-center" title="Download Code">
+          <i class="fas fa-download mr-2"></i> <span class="hidden sm:inline">Save</span>
+        </button>
+        <button id="share-btn" class="btn-secondary bg-purple-600 hover:bg-purple-700 py-2 px-4 rounded-lg flex items-center" title="Share Code">
+          <i class="fas fa-share-alt mr-2"></i> <span class="hidden sm:inline">Share</span>
+        </button>
+        <button id="settings-btn" class="btn-secondary py-2 px-4 rounded-lg flex items-center" title="Settings">
+          <i class="fas fa-cog mr-2"></i> <span class="hidden sm:inline">Settings</span>
+        </button>
+      </div>
+    </div>
+    
+    <div id="editor-terminal-container" class="flex flex-1 overflow-hidden h-full gap-4">
+      <div id="editor-container" class="flex-1 h-full relative rounded-lg overflow-hidden shadow-xl">
+        <!-- Editor loading indicator -->
+        <div id="editor-loading" class="absolute inset-0 bg-darker bg-opacity-75 flex items-center justify-center z-10 hidden">
+          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+        <textarea id="code-editor"></textarea>
+      </div>
+      <div class="resizer" id="resizer"></div>
+      <div id="terminal-container" class="flex-1 relative h-full rounded-lg overflow-hidden shadow-xl flex flex-col">
+        <div class="terminal-header bg-darker p-2 flex justify-between items-center border-b border-dark-gray">
+          <div class="flex items-center">
+            <i class="fas fa-terminal text-primary mr-2"></i>
+            <span class="text-sm font-semibold">Console Output</span>
+          </div>
+          <div class="flex gap-2">
+            <button id="clear-terminal" class="text-gray-400 hover:text-white text-sm" title="Clear Terminal">
+              <i class="fas fa-broom"></i>
+            </button>
+            <button id="hide-terminal" class="text-gray-400 hover:text-white text-sm" title="Hide Terminal">
+              <i class="fas fa-eye-slash"></i>
+            </button>
+          </div>
+        </div>
+        <div class="terminal-body flex-1 overflow-auto">
+          <pre id="terminal-output" class="p-4 text-gray-200 h-full font-mono"></pre>
+        </div>
+        <!-- Terminal loading indicator -->
+        <div id="terminal-loading" class="absolute inset-0 bg-darker bg-opacity-75 flex flex-col items-center justify-center z-10 hidden">
+          <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary mb-3"></div>
+          <p class="text-primary">Running...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Previous Output Section -->
+    <div id="previous-output-container" class="mt-4">
+      <div class="previous-output-header bg-darker p-2 flex justify-between items-center border-b border-dark-gray rounded-t-lg cursor-pointer">
+        <div class="flex items-center">
+          <i class="fas fa-history text-primary mr-2"></i>
+          <span class="text-sm font-semibold">Previous Outputs</span>
+          <span id="output-count" class="text-xs bg-primary text-white rounded-full px-2 py-0.5 ml-2">0</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="clear-all-outputs" class="text-gray-400 hover:text-white text-sm" title="Clear All Outputs">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+          <i id="toggle-previous" class="fas fa-chevron-down text-gray-400"></i>
+        </div>
+      </div>
+      <div id="previous-outputs-content" class="bg-dark border border-dark-gray border-t-0 rounded-b-lg overflow-hidden">
+        <div id="previous-outputs-list" class="overflow-y-auto max-h-64">
+          <!-- Previous outputs will be added here dynamically -->
+          <div class="empty-state p-4 text-center text-gray-400">
+            <i class="fas fa-code text-5xl mb-2"></i>
+            <p>Run your code to see outputs here</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes Section -->
+    <div id="notes-container" class="mt-4">
+      <div class="notes-header bg-darker p-2 flex justify-between items-center border-b border-dark-gray rounded-t-lg cursor-pointer">
+        <div class="flex items-center">
+          <i class="fas fa-sticky-note text-primary mr-2"></i>
+          <span class="text-sm font-semibold">Notes</span>
+        </div>
+        <i class="fas fa-chevron-down text-gray-400"></i>
+      </div>
+      <div class="notes-content bg-dark border border-dark-gray border-t-0 rounded-b-lg">
+        <textarea id="notes-editor" class="w-full p-4 bg-dark text-gray-200 border-none resize-none focus:outline-none font-mono" placeholder="Write your notes here..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="settings-modal p-6">
+      <div class="flex mb-4 overflow-x-auto gap-1">
+        <button class="tab-btn bg-primary text-white py-2 px-4 rounded-t" id="general-tab-btn" data-tab="general">
+          <i class="fas fa-cog mr-2"></i> General
+        </button>
+        <button class="tab-btn bg-dark-gray text-white py-2 px-4 rounded-t" id="appearance-tab-btn" data-tab="appearance">
+          <i class="fas fa-paint-brush mr-2"></i> Appearance
+        </button>
+        <button class="tab-btn bg-dark-gray text-white py-2 px-4 rounded-t" id="layout-tab-btn" data-tab="layout">
+          <i class="fas fa-columns mr-2"></i> Layout
+        </button>
+        <button class="tab-btn bg-dark-gray text-white py-2 px-4 rounded-t" id="keyboard-tab-btn" data-tab="keyboard">
+          <i class="fas fa-keyboard mr-2"></i> Shortcuts
+        </button>
+      </div>
+      <div id="general-tab" class="tab-content">
+        <h3 class="text-xl font-semibold text-white mb-4">
+          <i class="fas fa-cog mr-2 text-primary"></i> General Settings
+        </h3>
+        <div class="mt-4">
+          <label class="block text-gray-300 mb-2">UI Size</label>
+          <input id="ui-size-slider" type="range" min="80" max="120" value="100" class="slider">
+          <span id="ui-size-value" class="text-gray-300 block mt-2">100%</span>
+        </div>
+        <div class="mt-6">
+          <label class="block text-gray-300 mb-2">Font Size</label>
+          <input id="font-size-slider" type="range" min="12" max="24" value="16" class="slider">
+          <span id="font-size-value" class="text-gray-300 block mt-2">16px</span>
+        </div>
+        <div class="mt-6">
+          <label class="block text-gray-300 mb-2">Auto Save</label>
+          <div class="flex items-center">
+            <label class="inline-flex items-center">
+              <input type="checkbox" id="auto-save" class="form-checkbox h-5 w-5 text-primary bg-dark border-dark-gray rounded">
+              <span class="ml-2 text-gray-300">Enable auto save</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div id="appearance-tab" class="tab-content hidden">
+        <h3 class="text-xl font-semibold text-white mb-4">
+          <i class="fas fa-paint-brush mr-2 text-primary"></i> Appearance Settings
+        </h3>
+        <div class="mt-4">
+          <label class="block text-gray-300 mb-2">Editor Theme</label>
+          <select id="theme-select" class="language-select">
+            <option value="monokai">Monokai</option>
+            <option value="dracula">Dracula</option>
+            <option value="solarized-dark">Solarized Dark</option>
+            <option value="nord">Nord</option>
+            <option value="cobalt">Cobalt</option>
+            <option value="blackboard">Blackboard</option>
+            <option value="mdn-like">MDN Like</option>
+            <option value="gruvbox-dark">Gruvbox Dark</option>
+            <option value="tokyo-night">Tokyo Night</option>
+          </select>
+        </div>
+        <div class="mt-4">
+          <label class="block text-gray-300 mb-2">Line Numbers</label>
+          <div class="flex items-center">
+            <label class="inline-flex items-center">
+              <input type="checkbox" id="line-numbers" checked class="form-checkbox h-5 w-5 text-primary bg-dark border-dark-gray rounded">
+              <span class="ml-2 text-gray-300">Show line numbers</span>
+            </label>
+          </div>
+        </div>
+        <div class="mt-4">
+          <label class="block text-gray-300 mb-2">Word Wrap</label>
+          <div class="flex items-center">
+            <label class="inline-flex items-center">
+              <input type="checkbox" id="word-wrap" checked class="form-checkbox h-5 w-5 text-primary bg-dark border-dark-gray rounded">
+              <span class="ml-2 text-gray-300">Enable word wrap</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div id="layout-tab" class="tab-content hidden">
+        <h3 class="text-xl font-semibold text-white mb-4">
+          <i class="fas fa-columns mr-2 text-primary"></i> Layout Settings
+        </h3>
+        <div class="mt-4">
+          <label class="block text-gray-300 mb-2">Layout Mode</label>
+          <select id="layout-select" class="language-select">
+            <option value="default">Default (Split View)</option>
+            <option value="classroom">Classroom View</option>
+            <option value="editor-focus">Editor Focus</option>
+          </select>
+          <p class="text-xs text-gray-400 mt-2">
+            <span class="font-semibold">Default:</span> Split view with editor and terminal side by side.<br>
+            <span class="font-semibold">Classroom:</span> Full screen editor with floating terminal.<br>
+            <span class="font-semibold">Editor Focus:</span> Only shows editor, terminal appears on run.
+          </p>
+        </div>
+        <div class="mt-6">
+          <label class="block text-gray-300 mb-2">Terminal Position</label>
+          <select id="terminal-position" class="language-select">
+            <option value="right">Right (Side by Side)</option>
+            <option value="bottom">Bottom (Stacked)</option>
+          </select>
+        </div>
+        <div class="mt-6">
+          <label class="block text-gray-300 mb-2">Terminal Split Size</label>
+          <input id="terminal-size-slider" type="range" min="10" max="90" value="50" class="slider">
+          <span id="terminal-size-value" class="text-gray-300 block mt-2">50%</span>
+        </div>
+      </div>
+      <div id="keyboard-tab" class="tab-content hidden">
+        <h3 class="text-xl font-semibold text-white mb-4">
+          <i class="fas fa-keyboard mr-2 text-primary"></i> Keyboard Shortcuts
+        </h3>
+        <div class="mt-4 bg-darker p-3 rounded-lg max-h-60 overflow-y-auto">
+          <table class="w-full text-left text-gray-300 text-sm">
+            <tbody>
+              <tr class="border-b border-dark-gray">
+                <td class="py-2 font-semibold">Run Code</td>
+                <td class="py-2 text-right"><kbd class="px-2 py-1 bg-dark-gray rounded">Ctrl + Enter</kbd></td>
+              </tr>
+              <tr class="border-b border-dark-gray">
+                <td class="py-2 font-semibold">Save/Download Code</td>
+                <td class="py-2 text-right"><kbd class="px-2 py-1 bg-dark-gray rounded">Ctrl + S</kbd></td>
+              </tr>
+              <tr class="border-b border-dark-gray">
+                <td class="py-2 font-semibold">Copy Code</td>
+                <td class="py-2 text-right"><kbd class="px-2 py-1 bg-dark-gray rounded">Ctrl + Shift + C</kbd></td>
+              </tr>
+              <tr class="border-b border-dark-gray">
+                <td class="py-2 font-semibold">Toggle Terminal</td>
+                <td class="py-2 text-right"><kbd class="px-2 py-1 bg-dark-gray rounded">Ctrl + `</kbd></td>
+              </tr>
+              <tr class="border-b border-dark-gray">
+                <td class="py-2 font-semibold">Clear Terminal</td>
+                <td class="py-2 text-right"><kbd class="px-2 py-1 bg-dark-gray rounded">Ctrl + L</kbd></td>
+              </tr>
+              <tr class="border-b border-dark-gray">
+                <td class="py-2 font-semibold">Open Settings</td>
+                <td class="py-2 text-right"><kbd class="px-2 py-1 bg-dark-gray rounded">Ctrl + ,</kbd></td>
+              </tr>
+              <tr class="border-b border-dark-gray">
+                <td class="py-2 font-semibold">Toggle Layout Mode</td>
+                <td class="py-2 text-right"><kbd class="px-2 py-1 bg-dark-gray rounded">Ctrl + Shift + L</kbd></td>
+              </tr>
+              <tr class="border-b border-dark-gray">
+                <td class="py-2 font-semibold">Indent Code</td>
+                <td class="py-2 text-right"><kbd class="px-2 py-1 bg-dark-gray rounded">Tab</kbd></td>
+              </tr>
+              <tr>
+                <td class="py-2 font-semibold">Outdent Code</td>
+                <td class="py-2 text-right"><kbd class="px-2 py-1 bg-dark-gray rounded">Shift + Tab</kbd></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="flex gap-2 mt-6">
+        <button id="reset-settings" class="btn-secondary py-2 px-4 rounded flex-1">
+          <i class="fas fa-undo mr-2"></i> Reset
+        </button>
+        <button id="close-settings" class="btn-danger py-2 px-4 rounded flex-1">
+          <i class="fas fa-times mr-2"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share Modal -->
+  <div id="share-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="settings-modal p-6 max-w-lg">
+      <h3 class="text-xl font-semibold text-white mb-4">
+        <i class="fas fa-share-alt mr-2 text-purple-500"></i> Share Your Code
+      </h3>
+      <div class="mt-4">
+        <label class="block text-gray-300 mb-2">Code Link</label>
+        <div class="flex gap-2">
+          <input type="text" id="share-link" readonly class="bg-darker text-gray-300 py-2 px-3 rounded-lg w-full" value="https://codeer.org/s/abc123">
+          <button id="copy-link" class="btn-secondary py-2 px-4 rounded-lg">
+            <i class="fas fa-copy"></i>
+          </button>
+        </div>
+      </div>
+      <div class="mt-6">
+        <label class="block text-gray-300 mb-2">Share on Social Media</label>
+        <div class="flex gap-3 justify-center mt-3">
+          <a href="#" class="bg-blue-600 hover:bg-blue-700 p-3 rounded-lg" title="Share on Twitter">
+            <i class="fab fa-twitter text-white text-xl"></i>
+          </a>
+          <a href="#" class="bg-blue-800 hover:bg-blue-900 p-3 rounded-lg" title="Share on Facebook">
+            <i class="fab fa-facebook-f text-white text-xl"></i>
+          </a>
+          <a href="#" class="bg-blue-500 hover:bg-blue-600 p-3 rounded-lg" title="Share on LinkedIn">
+            <i class="fab fa-linkedin-in text-white text-xl"></i>
+          </a>
+          <a href="#" class="bg-green-600 hover:bg-green-700 p-3 rounded-lg" title="Share on WhatsApp">
+            <i class="fab fa-whatsapp text-white text-xl"></i>
+          </a>
+        </div>
+      </div>
+      <div class="flex gap-2 mt-6">
+        <button id="close-share" class="btn-danger py-2 px-4 rounded w-full">
+          <i class="fas fa-times mr-2"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Welcome Code for Landing Page
+    const welcomeCodes = [
+      `print("Welcome to Codeer.org! Write your code here.") # Python`,
+      `console.log("Welcome to Codeer.org! Write your code here."); // JavaScript`,
+      `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Welcome to Codeer.org! Write your code here.");\n    }\n} // Java`,
+      `#include <stdio.h>\nint main() {\n    printf("Welcome to Codeer.org! Write your code here.\\n");\n    return 0;\n} // C`,
+      `#include <iostream>\nusing namespace std;\nint main() {\n    cout << "Welcome to Codeer.org! Write your code here." << endl;\n    return 0;\n} // C++`,
+      `puts "Welcome to Codeer.org! Write your code here." # Ruby`,
+      `<?php echo "Welcome to Codeer.org! Write your code here."; ?> // PHP`,
+      `class Program {\n    static void Main() {\n        System.Console.WriteLine("Welcome to Codeer.org! Write your code here.");\n    }\n} // C#`,
+      `fun main() {\n    println("Welcome to Codeer.org! Write your code here.")\n} // Kotlin`
+    ];
+    document.getElementById('welcome-code').textContent = welcomeCodes[Math.floor(Math.random() * welcomeCodes.length)];
+
+    // Default Starter Code for Each Language
+    const defaultPrograms = {
+      71: `print("Hello, world!")`, // Python
+      63: `console.log("Hello, world!");`, // JavaScript
+      62: `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, world!");\n    }\n}`, // Java
+      50: `#include <stdio.h>\nint main() {\n    printf("Hello, world!\\n");\n    return 0;\n}`, // C
+      54: `#include <iostream>\nusing namespace std;\nint main() {\n    cout << "Hello, world!" << endl;\n    return 0;\n}`, // C++
+      86: `puts "Hello, world!"`, // Ruby
+      74: `<?php\necho "Hello, world!";\n?>`, // PHP
+      52: `class Program {\n    static void Main() {\n        System.Console.WriteLine("Hello, world!");\n    }\n}`, // C#
+      78: `fun main() {\n    println("Hello, world!")\n}` // Kotlin
+    };
+
+    // File System for Multiple Files
+    let files = {
+      'main': {
+        content: '',
+        language: '71', // Default Python
+        extension: 'py'
+      }
+    };
+    let currentFile = 'main';
+    
+    // File counter for new files
+    let fileCounter = 1;
+    
+    // Create a new file
+    function createNewFile() {
+      const fileName = `file${fileCounter++}`;
+      const langId = document.getElementById('language-select').value;
+      const extensions = {
+        63: 'js', // JavaScript
+        71: 'py', // Python
+        50: 'c',  // C
+        54: 'cpp', // C++
+        62: 'java', // Java
+        78: 'kt', // Kotlin
+        74: 'php', // PHP
+        86: 'rb', // Ruby
+        52: 'cs' // C#
+      };
+      
+      files[fileName] = {
+        content: defaultPrograms[langId] || '',
+        language: langId,
+        extension: extensions[langId] || 'txt'
+      };
+      
+      saveCurrentFileContent();
+      switchToFile(fileName);
+      updateFileTabs();
+    }
+    
+    // Switch to a file
+    function switchToFile(fileName) {
+      if (files[fileName]) {
+        saveCurrentFileContent();
+        currentFile = fileName;
+        document.getElementById('language-select').value = files[fileName].language;
+        editor.setValue(files[fileName].content);
+        updateFileTabs();
+        
+        // Set the correct mode
+        const modeMap = {
+          71: 'python', // Python
+          63: 'javascript', // JavaScript
+          62: 'text/x-java', // Java
+          50: 'text/x-csrc', // C
+          54: 'text/x-c++src', // C++
+          86: 'ruby', // Ruby
+          74: 'php', // PHP
+          52: 'text/x-csharp', // C#
+          78: 'text/x-kotlin' // Kotlin
+        };
+        editor.setOption('mode', modeMap[files[fileName].language] || 'text');
+      }
+    }
+    
+    // Save current file content
+    function saveCurrentFileContent() {
+      if (files[currentFile]) {
+        files[currentFile].content = editor.getValue();
+        files[currentFile].language = document.getElementById('language-select').value;
+      }
+    }
+    
+    // Delete a file
+    function deleteFile(fileName) {
+      if (Object.keys(files).length <= 1) {
+        alert('Cannot delete the last file.');
+        return;
+      }
+      
+      if (files[fileName]) {
+        const isCurrentFile = fileName === currentFile;
+        delete files[fileName];
+        
+        if (isCurrentFile) {
+          currentFile = Object.keys(files)[0];
+          editor.setValue(files[currentFile].content);
+          document.getElementById('language-select').value = files[currentFile].language;
+          
+          // Set the correct mode
+          const modeMap = {
+            71: 'python',
+            63: 'javascript',
+            62: 'text/x-java',
+            50: 'text/x-csrc',
+            54: 'text/x-c++src',
+            86: 'ruby',
+            74: 'php',
+            52: 'text/x-csharp',
+            78: 'text/x-kotlin'
+          };
+          editor.setOption('mode', modeMap[files[currentFile].language] || 'text');
+        }
+        
+        updateFileTabs();
+      }
+    }
+    
+    // Update file tabs
+    function updateFileTabs() {
+      const tabsContainer = document.getElementById('file-tabs');
+      tabsContainer.innerHTML = '';
+      
+      Object.keys(files).forEach(fileName => {
+        const tabElement = document.createElement('div');
+        const isActive = fileName === currentFile;
+        const extension = files[fileName].extension;
+        
+        // Get appropriate icon for file type
+        const iconMap = {
+          'py': 'fab fa-python',
+          'js': 'fab fa-js',
+          'java': 'fab fa-java',
+          'c': 'fas fa-file-code',
+          'cpp': 'fas fa-file-code',
+          'rb': 'fas fa-gem',
+          'php': 'fab fa-php',
+          'cs': 'fas fa-code',
+          'kt': 'fas fa-code'
+        };
+        
+        const icon = iconMap[extension] || 'fas fa-file-code';
+        
+        tabElement.className = `file-tab ${isActive ? 'active bg-primary' : 'hover:bg-dark-gray'} px-3 py-2 text-sm flex items-center gap-1 cursor-pointer`;
+        tabElement.innerHTML = `
+          <i class="${icon} ${isActive ? 'text-white' : 'text-primary'}"></i>
+          <span>${fileName}.${extension}</span>
+          <i class="fas fa-times ml-2 text-xs hover:text-red-400" data-filename="${fileName}"></i>
+        `;
+        
+        tabElement.addEventListener('click', (e) => {
+          if (e.target.classList.contains('fa-times') || e.target.closest('.fa-times')) {
+            deleteFile(fileName);
+          } else {
+            switchToFile(fileName);
+          }
+        });
+        
+        tabsContainer.appendChild(tabElement);
+      });
+    }
+    
+    // Add event listener for new file button
+    document.getElementById('new-file-btn').addEventListener('click', createNewFile);
+
+    // CodeMirror Editor with Enhanced Syntax Highlighting
+    const editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
+      lineNumbers: true,
+      theme: localStorage.getItem('editorTheme') || 'monokai',
+      mode: 'javascript',
+      matchBrackets: true,
+      autoCloseBrackets: true,
+      highlightSelectionMatches: true,
+      styleActiveLine: true,
+      indentUnit: 4,
+      tabSize: 4,
+      lineWrapping: true,
+      extraKeys: {
+        'Ctrl-Enter': runCode,
+        'Cmd-Enter': runCode, 
+        'Ctrl-S': downloadCode,
+        'Cmd-S': downloadCode,
+        'Ctrl-Shift-C': copyCode,
+        'Cmd-Shift-C': copyCode,
+        'Ctrl-,': openSettings,
+        'Cmd-,': openSettings,
+        'Ctrl-L': clearTerminal,
+        'Cmd-L': clearTerminal,
+        'Ctrl-`': toggleTerminal,
+        'Cmd-`': toggleTerminal,
+        'Ctrl-Shift-L': cycleLayoutMode,
+        'Cmd-Shift-L': cycleLayoutMode,
+        'Tab': function(cm) {
+          if (cm.somethingSelected()) {
+            cm.indentSelection('add');
+          } else {
+            cm.replaceSelection('    ', 'end');
+          }
+        },
+        'Shift-Tab': function(cm) {
+          cm.indentSelection('subtract');
+        }
+      }
+    });
+
+    // Keyboard shortcut functions
+    function runCode() {
+      document.getElementById('run-btn').click();
+    }
+    
+    function downloadCode() {
+      document.getElementById('download-btn').click();
+    }
+    
+    function copyCode() {
+      document.getElementById('copy-btn').click();
+    }
+    
+    function openSettings() {
+      document.getElementById('settings-btn').click();
+    }
+    
+    function clearTerminal() {
+      document.getElementById('terminal-output').textContent = '';
+    }
+    
+    function toggleTerminal() {
+      const terminal = document.getElementById('terminal-container');
+      if (terminal.classList.contains('hidden')) {
+        terminal.classList.remove('hidden');
+      } else {
+        terminal.classList.add('hidden');
+      }
+    }
+    
+    function cycleLayoutMode() {
+      const layoutSelect = document.getElementById('layout-select');
+      const currentValue = layoutSelect.value;
+      const options = Array.from(layoutSelect.options).map(opt => opt.value);
+      const currentIndex = options.indexOf(currentValue);
+      const nextIndex = (currentIndex + 1) % options.length;
+      layoutSelect.value = options[nextIndex];
+      layoutSelect.dispatchEvent(new Event('change'));
+    }
+
+    // Apply Saved Settings
+    const applySettings = () => {
+      const uiSize = localStorage.getItem('uiSize') || '100';
+      const fontSize = localStorage.getItem('fontSize') || '16';
+      const theme = localStorage.getItem('editorTheme') || 'monokai';
+      const layout = localStorage.getItem('layout') || 'default';
+      const lineNumbers = localStorage.getItem('lineNumbers') !== 'false';
+      const wordWrap = localStorage.getItem('wordWrap') !== 'false';
+      const autoSave = localStorage.getItem('autoSave') === 'true';
+      const terminalPosition = localStorage.getItem('terminalPosition') || 'right';
+      const terminalSize = localStorage.getItem('terminalSize') || '50';
+
+      // UI Size
+      document.getElementById('ui-size-slider').value = uiSize;
+      document.getElementById('ui-size-value').textContent = `${uiSize}%`;
+      document.querySelectorAll('button:not(.window-button), select, input').forEach(el => {
+        el.style.transform = `scale(${uiSize / 100})`;
+      });
+
+      // Font Size
+      document.getElementById('font-size-slider').value = fontSize;
+      document.getElementById('font-size-value').textContent = `${fontSize}px`;
+      editor.getWrapperElement().style.fontSize = `${fontSize}px`;
+      document.getElementById('terminal-output').style.fontSize = `${fontSize}px`;
+
+      // Theme
+      document.getElementById('theme-select').value = theme;
+      editor.setOption('theme', theme);
+
+      // Layout
+      document.getElementById('layout-select').value = layout;
+      toggleLayout(layout);
+      
+      // Line Numbers
+      document.getElementById('line-numbers').checked = lineNumbers;
+      editor.setOption('lineNumbers', lineNumbers);
+      
+      // Word Wrap
+      document.getElementById('word-wrap').checked = wordWrap;
+      editor.setOption('lineWrapping', wordWrap);
+      
+      // Auto Save
+      document.getElementById('auto-save').checked = autoSave;
+      
+      // Terminal Position
+      document.getElementById('terminal-position').value = terminalPosition;
+      applyTerminalPosition(terminalPosition);
+      
+      // Terminal Size
+      document.getElementById('terminal-size-slider').value = terminalSize;
+      document.getElementById('terminal-size-value').textContent = `${terminalSize}%`;
+      applyTerminalSize(terminalSize);
+    };
+    
+    // Apply terminal position
+    function applyTerminalPosition(position) {
+      const editorTerminalContainer = document.getElementById('editor-terminal-container');
+      const resizer = document.getElementById('resizer');
+      
+      if (position === 'bottom') {
+        editorTerminalContainer.classList.remove('flex');
+        editorTerminalContainer.classList.add('flex-col');
+        resizer.classList.remove('resizer');
+        resizer.classList.add('resizer-horizontal');
+        resizer.style.width = '100%';
+        resizer.style.height = '8px';
+        resizer.style.cursor = 'row-resize';
+      } else {
+        editorTerminalContainer.classList.remove('flex-col');
+        editorTerminalContainer.classList.add('flex');
+        resizer.classList.remove('resizer-horizontal');
+        resizer.classList.add('resizer');
+        resizer.style.width = '8px';
+        resizer.style.height = '';
+        resizer.style.cursor = 'col-resize';
+      }
+      
+      editor.refresh();
+    }
+    
+    // Apply terminal size
+    function applyTerminalSize(size) {
+      const editorContainer = document.getElementById('editor-container');
+      const terminalContainer = document.getElementById('terminal-container');
+      const terminalPosition = document.getElementById('terminal-position').value;
+      
+      if (terminalPosition === 'right') {
+        editorContainer.style.width = `${100 - size}%`;
+        terminalContainer.style.width = `${size}%`;
+      } else {
+        editorContainer.style.height = `${100 - size}%`;
+        terminalContainer.style.height = `${size}%`;
+      }
+      
+      editor.refresh();
+    }
+
+    // Page Navigation
+    document.getElementById('start-coding').addEventListener('click', () => {
+      document.getElementById('landing-page').classList.add('hidden');
+      document.getElementById('compiler-page').classList.remove('hidden');
+      editor.refresh();
+    });
+
+    // Fetch Languages and Populate Dropdown with Initial Code
+    fetch('https://code.sriox.com/languages')
+      .then(response => {
+        if (!response.ok) throw new Error('Failed to fetch languages');
+        return response.json();
+      })
+      .then(data => {
+        const select = document.getElementById('language-select');
+        select.innerHTML = ''; // Clear any existing options
+        
+        data.forEach(lang => {
+          const option = document.createElement('option');
+          option.value = lang.id;
+          option.textContent = lang.name;
+          select.appendChild(option);
+        });
+        
+        // Set default language and code after languages are loaded
+        select.value = '71'; // Default to Python
+        editor.setValue(defaultPrograms['71']);
+        editor.setOption('mode', 'python');
+        
+        // Initialize files object
+        files.main.content = defaultPrograms['71'];
+        files.main.language = '71';
+        files.main.extension = 'py';
+        
+        // Update the file tabs
+        updateFileTabs();
+      })
+      .catch(error => {
+        console.error(error);
+        document.getElementById('terminal-output').textContent = 'Error loading languages. Please try again later.';
+      });
+
+    // Language Change Handler
+    document.getElementById('language-select').addEventListener('change', (e) => {
+      const languageId = e.target.value;
+      
+      // Update current file language
+      if (files[currentFile]) {
+        files[currentFile].language = languageId;
+        
+        // Update extension
+        const extensions = {
+          63: 'js', // JavaScript
+          71: 'py', // Python
+          50: 'c',  // C
+          54: 'cpp', // C++
+          62: 'java', // Java
+          78: 'kt', // Kotlin
+          74: 'php', // PHP
+          86: 'rb', // Ruby
+          52: 'cs' // C#
+        };
+        files[currentFile].extension = extensions[languageId] || 'txt';
+        updateFileTabs();
+      }
+      
+      // If file is empty, set default content
+      if (editor.getValue().trim() === '') {
+        editor.setValue(defaultPrograms[languageId] || '');
+      }
+      
+      const modeMap = {
+        71: 'python', // Python
+        63: 'javascript', // JavaScript
+        62: 'text/x-java', // Java
+        50: 'text/x-csrc', // C
+        54: 'text/x-c++src', // C++
+        86: 'ruby', // Ruby
+        74: 'php', // PHP
+        52: 'text/x-csharp', // C#
+        78: 'text/x-kotlin' // Kotlin
+      };
+      editor.setOption('mode', modeMap[languageId] || 'text');
+    });
+
+    // Run Code with Loading Indicator
+    document.getElementById('run-btn').addEventListener('click', () => {
+      const code = editor.getValue();
+      const languageId = document.getElementById('language-select').value;
+      
+      if (!code || !languageId) {
+        document.getElementById('terminal-output').textContent = 'Please enter code and select a language.';
+        return;
+      }
+      
+      // Show terminal if hidden based on current layout mode
+      const currentLayout = document.getElementById('layout-select').value;
+      const terminalContainer = document.getElementById('terminal-container');
+      
+      if (currentLayout === 'classroom') {
+        // In classroom mode, make sure the terminal is visible
+        terminalContainer.style.display = 'flex';
+        terminalContainer.classList.remove('hidden');
+        
+        // Make sure it's positioned properly if it was previously hidden
+        if (!terminalContainer.style.left || !terminalContainer.style.top) {
+          terminalContainer.style.left = '50px';
+          terminalContainer.style.top = '50px';
+        }
+      } else if (currentLayout === 'editor-focus') {
+        // In editor-focus mode, show the terminal using the selected position
+        const terminalPosition = document.getElementById('terminal-position').value;
+        terminalContainer.classList.remove('hidden');
+        const resizer = document.getElementById('resizer');
+        resizer.style.display = '';
+        applyTerminalPosition(terminalPosition);
+      } else {
+        // In default mode, just make sure it's visible
+        terminalContainer.classList.remove('hidden');
+      }
+      
+      // Show loading indicator
+      document.getElementById('terminal-loading').classList.remove('hidden');
+      document.getElementById('terminal-output').textContent = '';
+      
+      fetch('https://code.sriox.com/submissions?base64_encoded=false&wait=true', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source_code: code, language_id: languageId })
+      })
+        .then(response => {
+          if (!response.ok) throw new Error('Compilation failed');
+          return response.json();
+        })
+        .then(data => {
+          // Format and colorize output
+          let output = '';
+          
+          if (data.compile_output) {
+            output += `<span class="text-yellow-400">== Compilation Output ==</span>\n${data.compile_output}\n\n`;
+          }
+          
+          if (data.stdout) {
+            output += `<span class="text-green-400">== Standard Output ==</span>\n${data.stdout}\n`;
+          }
+          
+          if (data.stderr) {
+            output += `<span class="text-red-400">== Standard Error ==</span>\n${data.stderr}\n`;
+          }
+          
+          if (!output) {
+            output = '<span class="text-gray-400">No output</span>';
+          }
+          
+          // Add execution metrics
+          if (data.time !== null && data.memory !== null) {
+            output += `\n<span class="text-blue-400">== Execution Stats ==</span>\n`;
+            output += `Time: ${data.time}s | Memory: ${Math.round(data.memory / 1024)} KB\n`;
+          }
+          
+          document.getElementById('terminal-output').innerHTML = output;
+          
+          // Save output to previous outputs
+          const previousOutputsList = document.getElementById('previous-outputs-list');
+          const outputCount = document.getElementById('output-count');
+          const newOutput = document.createElement('div');
+          newOutput.className = 'previous-output p-4 border-b border-dark-gray text-gray-200';
+          newOutput.innerHTML = output;
+          previousOutputsList.prepend(newOutput);
+          
+          // Update output count
+          const currentCount = parseInt(outputCount.textContent, 10) || 0;
+          outputCount.textContent = currentCount + 1;
+          
+          // Hide empty state if present
+          const emptyState = previousOutputsList.querySelector('.empty-state');
+          if (emptyState) emptyState.remove();
+          
+          // Save output to storage
+          saveOutputToStorage(output, languageId);
+          
+          // Hide loading indicator
+          document.getElementById('terminal-loading').classList.add('hidden');
+        })
+        .catch(error => {
+          document.getElementById('terminal-output').innerHTML = `<span class="text-red-500">Error: ${error.message}</span>`;
+          document.getElementById('terminal-loading').classList.add('hidden');
+        });
+    });
+
+    // Copy Code
+    document.getElementById('copy-btn').addEventListener('click', () => {
+      navigator.clipboard.writeText(editor.getValue()).then(() => {
+        const originalText = document.getElementById('copy-btn').innerHTML;
+        document.getElementById('copy-btn').innerHTML = '<i class="fas fa-check mr-2"></i> <span class="hidden sm:inline">Copied!</span>';
+        setTimeout(() => {
+          document.getElementById('copy-btn').innerHTML = originalText;
+        }, 2000);
+      }).catch(() => {
+        alert('Failed to copy code.');
+      });
+    });
+
+    // Delete Code
+    document.getElementById('delete-btn').addEventListener('click', () => {
+      if (confirm('Are you sure you want to clear the code?')) {
+        editor.setValue('');
+        document.getElementById('terminal-output').textContent = '';
+      }
+    });
+
+    // Download Code
+    function downloadCode() {
+      const code = editor.getValue();
+      if (!code.trim()) {
+        alert('No code to download.');
+        return;
+      }
+      
+      const fileName = currentFile || 'code';
+      const extension = files[currentFile].extension || 'txt';
+      
+      const blob = new Blob([code], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${fileName}.${extension}`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+    
+    // Attach download function to button
+    document.getElementById('download-btn').addEventListener('click', downloadCode);
+
+    // Share Code
+    document.getElementById('share-btn').addEventListener('click', () => {
+      // In a production app, you would save the code to a backend and get a shareable URL
+      // For demo purposes, we'll just show the modal
+      const shareLink = document.getElementById('share-link');
+      shareLink.value = `https://codeer.org/s/${btoa(currentFile).substring(0, 6)}`;
+      document.getElementById('share-modal').classList.remove('hidden');
+    });
+    
+    // Close Share Modal
+    document.getElementById('close-share').addEventListener('click', () => {
+      document.getElementById('share-modal').classList.add('hidden');
+    });
+    
+    // Copy Share Link
+    document.getElementById('copy-link').addEventListener('click', () => {
+      const shareLink = document.getElementById('share-link');
+      shareLink.select();
+      document.execCommand('copy');
+      const copyLinkBtn = document.getElementById('copy-link');
+      copyLinkBtn.innerHTML = '<i class="fas fa-check"></i>';
+      setTimeout(() => {
+        copyLinkBtn.innerHTML = '<i class="fas fa-copy"></i>';
+      }, 2000);
+    });
+
+    // Clear Terminal
+    document.getElementById('clear-terminal').addEventListener('click', () => {
+      document.getElementById('terminal-output').textContent = '';
+    });
+
+    // Hide Terminal
+    document.getElementById('hide-terminal').addEventListener('click', () => {
+      document.getElementById('terminal-container').classList.add('hidden');
+    });
+
+    // Clear All Previous Outputs
+    document.getElementById('clear-all-outputs').addEventListener('click', () => {
+      const previousOutputsList = document.getElementById('previous-outputs-list');
+      previousOutputsList.innerHTML = `
+        <div class="empty-state p-4 text-center text-gray-400">
+          <i class="fas fa-code text-5xl mb-2"></i>
+          <p>Run your code to see outputs here</p>
+        </div>
+      `;
+      document.getElementById('output-count').textContent = '0';
+    });
+
+    // Toggle Previous Outputs Section
+    document.getElementById('toggle-previous').addEventListener('click', () => {
+      const previousOutputsContent = document.getElementById('previous-outputs-content');
+      const toggleIcon = document.getElementById('toggle-previous');
+      if (previousOutputsContent.classList.contains('hidden')) {
+        previousOutputsContent.classList.remove('hidden');
+        toggleIcon.classList.remove('fa-chevron-down');
+        toggleIcon.classList.add('fa-chevron-up');
+      } else {
+        previousOutputsContent.classList.add('hidden');
+        toggleIcon.classList.remove('fa-chevron-up');
+        toggleIcon.classList.add('fa-chevron-down');
+      }
+    });
+
+    // Resizer functionality
+    const resizer = document.getElementById('resizer');
+    let isResizing = false;
+    let lastX, lastY;
+
+    resizer.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      isResizing = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      
+      // Add overlay to capture mouse events during resize
+      const overlay = document.createElement('div');
+      overlay.id = 'resize-overlay';
+      overlay.style.position = 'fixed';
+      overlay.style.top = '0';
+      overlay.style.left = '0';
+      overlay.style.right = '0';
+      overlay.style.bottom = '0';
+      overlay.style.zIndex = '9999';
+      overlay.style.cursor = document.getElementById('terminal-position').value === 'right' ? 'col-resize' : 'row-resize';
+      document.body.appendChild(overlay);
+      
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', stopResize);
+    });
+    
+    function handleMouseMove(e) {
+      if (!isResizing) return;
+      
+      const editorTerminalContainer = document.getElementById('editor-terminal-container');
+      const editorContainer = document.getElementById('editor-container');
+      const terminalContainer = document.getElementById('terminal-container');
+      const terminalPosition = document.getElementById('terminal-position').value;
+      
+      if (terminalPosition === 'right') {
+        // Horizontal resize
+        const dx = e.clientX - lastX;
+        lastX = e.clientX;
+        
+        const totalWidth = editorTerminalContainer.offsetWidth;
+        const currentEditorWidth = editorContainer.offsetWidth;
+        const newEditorWidth = currentEditorWidth + dx;
+        const editorWidthPercentage = (newEditorWidth / totalWidth) * 100;
+        
+        if (editorWidthPercentage > 10 && editorWidthPercentage < 90) {
+          const terminalWidthPercentage = 100 - editorWidthPercentage;
+          editorContainer.style.width = `${editorWidthPercentage}%`;
+          terminalContainer.style.width = `${terminalWidthPercentage}%`;
+          
+          // Update terminal size setting
+          document.getElementById('terminal-size-slider').value = terminalWidthPercentage;
+          document.getElementById('terminal-size-value').textContent = `${Math.round(terminalWidthPercentage)}%`;
+          localStorage.setItem('terminalSize', Math.round(terminalWidthPercentage));
+        }
+      } else {
+        // Vertical resize
+        const dy = e.clientY - lastY;
+        lastY = e.clientY;
+        
+        const totalHeight = editorTerminalContainer.offsetHeight;
+        const currentEditorHeight = editorContainer.offsetHeight;
+        const newEditorHeight = currentEditorHeight + dy;
+        const editorHeightPercentage = (newEditorHeight / totalHeight) * 100;
+        
+        if (editorHeightPercentage > 10 && editorHeightPercentage < 90) {
+          const terminalHeightPercentage = 100 - editorHeightPercentage;
+          editorContainer.style.height = `${editorHeightPercentage}%`;
+          terminalContainer.style.height = `${terminalHeightPercentage}%`;
+          
+          // Update terminal size setting
+          document.getElementById('terminal-size-slider').value = terminalHeightPercentage;
+          document.getElementById('terminal-size-value').textContent = `${Math.round(terminalHeightPercentage)}%`;
+          localStorage.setItem('terminalSize', Math.round(terminalHeightPercentage));
+        }
+      }
+      
+      editor.refresh();
+    }
+    
+    function stopResize() {
+      if (isResizing) {
+        isResizing = false;
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', stopResize);
+        
+        // Remove the overlay
+        const overlay = document.getElementById('resize-overlay');
+        if (overlay) {
+          document.body.removeChild(overlay);
+        }
+        
+        editor.refresh();
+      }
+    }
+
+    // Settings Modal
+    document.getElementById('settings-btn').addEventListener('click', () => {
+      document.getElementById('settings-modal').classList.remove('hidden');
+    });
+    
+    document.getElementById('close-settings').addEventListener('click', () => {
+      document.getElementById('settings-modal').classList.add('hidden');
+    });
+    
+    // Reset Settings
+    document.getElementById('reset-settings').addEventListener('click', () => {
+      if (confirm('Reset all settings to default?')) {
+        localStorage.removeItem('uiSize');
+        localStorage.removeItem('fontSize');
+        localStorage.removeItem('editorTheme');
+        localStorage.removeItem('layout');
+        localStorage.removeItem('lineNumbers');
+        localStorage.removeItem('wordWrap');
+        localStorage.removeItem('autoSave');
+        localStorage.removeItem('terminalPosition');
+        localStorage.removeItem('terminalSize');
+        
+        applySettings();
+      }
+    });
+
+    // Tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Remove active class from all tabs
+        document.querySelectorAll('.tab-btn').forEach(b => {
+          b.classList.remove('bg-primary');
+          b.classList.add('bg-dark-gray');
+        });
+        
+        // Hide all tab content
+        document.querySelectorAll('.tab-content').forEach(t => {
+          t.classList.add('hidden');
+        });
+        
+        // Add active class to clicked tab
+        btn.classList.remove('bg-dark-gray');
+        btn.classList.add('bg-primary');
+        
+        // Show the corresponding tab content
+        document.getElementById(`${btn.dataset.tab}-tab`).classList.remove('hidden');
+      });
+    });
+
+    // UI Size Slider
+    document.getElementById('ui-size-slider').addEventListener('input', (e) => {
+      const size = e.target.value;
+      document.getElementById('ui-size-value').textContent = `${size}%`;
+      document.querySelectorAll('button:not(.window-button), select, input').forEach(el => {
+        el.style.transform = `scale(${size / 100})`;
+      });
+      localStorage.setItem('uiSize', size);
+    });
+
+    // Font Size Slider
+    document.getElementById('font-size-slider').addEventListener('input', (e) => {
+      const size = e.target.value;
+      document.getElementById('font-size-value').textContent = `${size}px`;
+      editor.getWrapperElement().style.fontSize = `${size}px`;
+      document.getElementById('terminal-output').style.fontSize = `${size}px`;
+      localStorage.setItem('fontSize', size);
+    });
+    
+    // Line Numbers Toggle
+    document.getElementById('line-numbers').addEventListener('change', (e) => {
+      const showLineNumbers = e.target.checked;
+      editor.setOption('lineNumbers', showLineNumbers);
+      localStorage.setItem('lineNumbers', showLineNumbers);
+    });
+    
+    // Word Wrap Toggle
+    document.getElementById('word-wrap').addEventListener('change', (e) => {
+      const enableWordWrap = e.target.checked;
+      editor.setOption('lineWrapping', enableWordWrap);
+      localStorage.setItem('wordWrap', enableWordWrap);
+    });
+    
+    // Auto Save Toggle
+    document.getElementById('auto-save').addEventListener('change', (e) => {
+      const autoSave = e.target.checked;
+      localStorage.setItem('autoSave', autoSave);
+      
+      if (autoSave) {
+        // Set up auto-save interval
+        window.autoSaveInterval = setInterval(() => {
+          saveCurrentFileContent();
+        }, 30000); // Save every 30 seconds
+      } else {
+        // Clear auto-save interval
+        if (window.autoSaveInterval) {
+          clearInterval(window.autoSaveInterval);
+        }
+      }
+    });
+    
+    // Terminal Position
+    document.getElementById('terminal-position').addEventListener('change', (e) => {
+      const position = e.target.value;
+      localStorage.setItem('terminalPosition', position);
+      applyTerminalPosition(position);
+    });
+    
+    // Terminal Size
+    document.getElementById('terminal-size-slider').addEventListener('input', (e) => {
+      const size = e.target.value;
+      document.getElementById('terminal-size-value').textContent = `${size}%`;
+      localStorage.setItem('terminalSize', size);
+      applyTerminalSize(size);
+    });
+
+    // Theme Selector
+    document.getElementById('theme-select').addEventListener('change', (e) => {
+      const theme = e.target.value;
+      editor.setOption('theme', theme);
+      localStorage.setItem('editorTheme', theme);
+      const bgColors = {
+        'monokai': '#272822',
+        'dracula': '#282a36',
+        'solarized-dark': '#002b36',
+        'nord': '#2e3440',
+        'cobalt': '#002240',
+        'blackboard': '#1a1a1a',
+        'mdn-like': '#1b1b1a',
+        'gruvbox-dark': '#282828',
+        'tokyo-night': '#1a1b26'
+      };
+      
+      // Primary/accent colors for each theme
+      const accentColors = {
+        'monokai': { primary: '#a6e22e', secondary: '#66d9ef' },
+        'dracula': { primary: '#bd93f9', secondary: '#ff79c6' },
+        'solarized-dark': { primary: '#b58900', secondary: '#2aa198' },
+        'nord': { primary: '#88c0d0', secondary: '#81a1c1' },
+        'cobalt': { primary: '#ffc600', secondary: '#3ad900' },
+        'blackboard': { primary: '#f8f8f8', secondary: '#ff6400' },
+        'mdn-like': { primary: '#5c8db8', secondary: '#48bb78' },
+        'gruvbox-dark': { primary: '#fabd2f', secondary: '#b8bb26' },
+        'tokyo-night': { primary: '#7aa2f7', secondary: '#9ece6a' }
+      };
+      
+      // Get the colors for the selected theme
+      const themeColor = accentColors[theme] || { primary: '#10b981', secondary: '#059669' };
+      
+      // Update main color variables
+      document.documentElement.style.setProperty('--primary', themeColor.primary);
+      document.documentElement.style.setProperty('--primary-dark', themeColor.secondary);
+      document.documentElement.style.setProperty('--primary-light', themeColor.primary + '80');
+      
+      // Update background colors
+      document.body.style.background = bgColors[theme] || '#1a202c';
+      
+      // Apply the theme to dark background elements (with transparency)
+      document.querySelectorAll('.bg-darker').forEach(el => {
+        el.style.background = bgColors[theme] ? (bgColors[theme] + '99') : '#0f172a';
+      });
+      
+      // Update modals, headers, and other UI elements
+      document.querySelectorAll('.settings-modal, .terminal-header, .notes-header, .previous-output-header').forEach(el => {
+        el.style.background = bgColors[theme] || '#0f172a';
+      });
+      
+      // Update the terminal output area
+      const terminalOutput = document.getElementById('terminal-output');
+      if (terminalOutput) {
+        terminalOutput.style.background = bgColors[theme] || '#1a202c';
+      }
+      
+      // Update the notes editor area
+      const notesEditor = document.getElementById('notes-editor');
+      if (notesEditor) {
+        notesEditor.style.background = bgColors[theme] || '#1a202c';
+        notesEditor.style.color = themeColor.primary;
+      }
+      
+      // Update dropdowns
+      document.querySelectorAll('.language-select').forEach(el => {
+        el.style.background = bgColors[theme] || '#1a202c';
+        el.style.borderColor = themeColor.primary + '50';
+      });
+      
+      // Update form controls
+      document.querySelectorAll('.form-checkbox').forEach(el => {
+        el.style.borderColor = themeColor.primary;
+      });
+      
+      // Update code tabs
+      document.querySelectorAll('.file-tab.active').forEach(el => {
+        el.style.backgroundColor = themeColor.primary;
+      });
+      
+      // Update active tab buttons
+      document.querySelectorAll('.tab-btn.bg-primary').forEach(el => {
+        el.style.backgroundColor = themeColor.primary + ' !important';
+      });
+    });
+
+    // Layout Selector
+    const toggleLayout = (mode) => {
+      const editorContainer = document.getElementById('editor-container');
+      const terminalContainer = document.getElementById('terminal-container');
+      const resizer = document.getElementById('resizer');
+      const editorTerminalContainer = document.getElementById('editor-terminal-container');
+      const existingRunBtn = document.querySelector('.fixed-run-btn');
+      const existingExitBtn = document.querySelector('.exit-classroom-btn');
+      
+      if (existingRunBtn) existingRunBtn.remove();
+      if (existingExitBtn) existingExitBtn.remove();
+
+      if (mode === 'classroom') {
+        // Remove all existing event listeners for clean setup
+        const terminalHeader = terminalContainer.querySelector('.terminal-header');
+        const newTerminalHeader = terminalHeader.cloneNode(true);
+        terminalHeader.parentNode.replaceChild(newTerminalHeader, terminalHeader);
+        
+        // Re-attach event listeners for clear and hide buttons
+        newTerminalHeader.querySelector('#clear-terminal').addEventListener('click', clearTerminal);
+        newTerminalHeader.querySelector('#hide-terminal').addEventListener('click', () => {
+          terminalContainer.style.display = 'none';
+        });
+        
+        // Classroom layout: Full-screen editor with floating terminal
+        editorTerminalContainer.classList.remove('flex', 'flex-col');
+        editorContainer.style.position = 'absolute';
+        editorContainer.style.inset = '0';
+        editorContainer.style.margin = '0';
+        editorContainer.style.padding = '0';
+        editorContainer.style.width = '100%';
+        editorContainer.style.height = '100%';
+        editorContainer.style.zIndex = '1';
+        
+        terminalContainer.classList.add('floating-terminal');
+        terminalContainer.style.position = 'absolute';
+        terminalContainer.style.width = '400px';
+        terminalContainer.style.height = '250px';
+        terminalContainer.style.left = '50px';
+        terminalContainer.style.top = '50px';
+        terminalContainer.style.zIndex = '10';
+        terminalContainer.style.resize = 'both';
+        terminalContainer.style.overflow = 'hidden';
+        terminalContainer.style.display = 'flex';
+        terminalContainer.style.flexDirection = 'column';
+        resizer.style.display = 'none';
+        
+        // Make terminal draggable by its header
+        let isDragging = false;
+        let startX, startY, startLeft, startTop;
+        
+        const startDrag = (e) => {
+          const isClickInHeader = e.target.closest('.terminal-header');
+          if (!isClickInHeader) return;
+          
+          isDragging = true;
+          startX = e.clientX;
+          startY = e.clientY;
+          startLeft = parseInt(getComputedStyle(terminalContainer).left, 10);
+          startTop = parseInt(getComputedStyle(terminalContainer).top, 10);
+          
+          terminalContainer.style.cursor = 'grabbing';
+          
+          // Prevent text selection during drag
+          document.body.style.userSelect = 'none';
+          e.preventDefault();
+        };
+        
+        const drag = (e) => {
+          if (!isDragging) return;
+          
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+          
+          terminalContainer.style.left = `${startLeft + dx}px`;
+          terminalContainer.style.top = `${startTop + dy}px`;
+        };
+        
+        const stopDrag = () => {
+          if (isDragging) {
+            isDragging = false;
+            terminalContainer.style.cursor = 'grab';
+            document.body.style.userSelect = '';
+          }
+        };
+        
+        // Add new event listeners
+        terminalContainer.addEventListener('mousedown', startDrag);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', stopDrag);
+        document.addEventListener('mouseleave', stopDrag);
+
+        // Add touch events for mobile dragging support
+        const touchStartDrag = (e) => {
+          const isClickInHeader = e.target.closest('.terminal-header');
+          if (!isClickInHeader) return;
+          
+          isDragging = true;
+          startX = e.touches[0].clientX;
+          startY = e.touches[0].clientY;
+          startLeft = parseInt(getComputedStyle(terminalContainer).left, 10);
+          startTop = parseInt(getComputedStyle(terminalContainer).top, 10);
+          
+          terminalContainer.style.cursor = 'grabbing';
+          e.preventDefault();
+        };
+        
+        const touchDrag = (e) => {
+          if (!isDragging) return;
+          
+          const dx = e.touches[0].clientX - startX;
+          const dy = e.touches[0].clientY - startY;
+          
+          terminalContainer.style.left = `${startLeft + dx}px`;
+          terminalContainer.style.top = `${startTop + dy}px`;
+        };
+        
+        const touchStopDrag = () => {
+          if (isDragging) {
+            isDragging = false;
+            terminalContainer.style.cursor = 'grab';
+          }
+        };
+        
+        // Add touch event listeners
+        terminalContainer.addEventListener('touchstart', touchStartDrag);
+        document.addEventListener('touchmove', touchDrag);
+        document.addEventListener('touchend', touchStopDrag);
+        document.addEventListener('touchcancel', touchStopDrag);
+
+        // Add floating run button
+        const runBtn = document.createElement('button');
+        runBtn.className = 'fixed-run-btn fixed bottom-4 right-4 btn-primary py-3 px-6 rounded-full shadow-lg z-20';
+        runBtn.innerHTML = '<i class="fas fa-play mr-2"></i> Run';
+        runBtn.addEventListener('click', () => document.getElementById('run-btn').click());
+        document.body.appendChild(runBtn);
+
+        // Add exit classroom button
+        const exitBtn = document.createElement('button');
+        exitBtn.className = 'exit-classroom-btn fixed top-4 right-4 btn-danger py-2 px-4 rounded z-20';
+        exitBtn.innerHTML = '<i class="fas fa-times mr-2"></i> Exit Classroom';
+        exitBtn.addEventListener('click', () => {
+          document.getElementById('layout-select').value = 'default';
+          localStorage.setItem('layout', 'default');
+          toggleLayout('default');
+        });
+        document.body.appendChild(exitBtn);
+        
+        // Make terminal header handle more obvious
+        const terminalHeaderNew = terminalContainer.querySelector('.terminal-header');
+        terminalHeaderNew.style.cursor = 'grab';
+        terminalHeaderNew.style.backgroundColor = 'var(--dark-gray)';
+      } 
+      else if (mode === 'editor-focus') {
+        // Editor focus: Hide terminal, show only on run
+        const terminalPosition = document.getElementById('terminal-position').value;
+        
+        // Remove classroom-specific styles
+        editorContainer.style.position = '';
+        editorContainer.style.inset = '';
+        editorContainer.style.margin = '';
+        editorContainer.style.padding = '';
+        editorContainer.style.zIndex = '';
+        
+        terminalContainer.style.position = '';
+        terminalContainer.style.resize = '';
+        terminalContainer.classList.remove('floating-terminal');
+        
+        editorTerminalContainer.classList.remove('flex-col');
+        editorTerminalContainer.classList.add('flex');
+        editorContainer.style.width = '100%';
+        editorContainer.style.height = '';
+        terminalContainer.style.width = '';
+        terminalContainer.style.height = '';
+        terminalContainer.style.left = '';
+        terminalContainer.style.top = '';
+        terminalContainer.classList.add('hidden');
+        resizer.style.display = 'none';
+        
+        // Override the run button to show terminal on click
+        const originalRunHandler = document.getElementById('run-btn').onclick;
+        document.getElementById('run-btn').onclick = function() {
+          terminalContainer.classList.remove('hidden');
+          applyTerminalPosition(terminalPosition);
+          resizer.style.display = '';
+          originalRunHandler.call(this);
+        };
+      } 
+      else {
+        // Default layout: Side by side or stacked
+        const terminalPosition = document.getElementById('terminal-position').value;
+        
+        // Remove classroom-specific styles
+        editorContainer.style.position = '';
+        editorContainer.style.inset = '';
+        editorContainer.style.margin = '';
+        editorContainer.style.padding = '';
+        editorContainer.style.zIndex = '';
+        
+        terminalContainer.style.position = '';
+        terminalContainer.style.resize = '';
+        terminalContainer.classList.remove('floating-terminal');
+        
+        // Remove draggable event listeners if they exist
+        if (typeof startDrag === 'function') {
+          terminalContainer.removeEventListener('mousedown', startDrag);
+          document.removeEventListener('mousemove', drag);
+          document.removeEventListener('mouseup', stopDrag);
+        }
+        
+        editorContainer.style.width = '';
+        editorContainer.style.height = '';
+        terminalContainer.style.width = '';
+        terminalContainer.style.height = '';
+        terminalContainer.style.left = '';
+        terminalContainer.style.top = '';
+        terminalContainer.classList.remove('hidden');
+        terminalContainer.style.display = '';
+        terminalContainer.style.flexDirection = '';
+        resizer.style.display = '';
+        
+        applyTerminalPosition(terminalPosition);
+        
+        // Restore original run handler
+        document.getElementById('run-btn').onclick = runCode;
+      }
+      
+      editor.refresh();
+    };
+
+    document.getElementById('layout-select').addEventListener('change', (e) => {
+      const mode = e.target.value;
+      localStorage.setItem('layout', mode);
+      toggleLayout(mode);
+    });
+
+    // Notes section functionality
+    const notesContainer = document.getElementById('notes-container');
+    const notesHeader = document.querySelector('.notes-header');
+    const notesEditor = document.getElementById('notes-editor');
+    
+    // Toggle notes section collapse/expand
+    notesHeader.addEventListener('click', () => {
+      notesContainer.classList.toggle('collapsed');
+      const chevron = notesHeader.querySelector('.fas');
+      
+      if (notesContainer.classList.contains('collapsed')) {
+        chevron.classList.remove('fa-chevron-down');
+        chevron.classList.add('fa-chevron-up');
+      } else {
+        chevron.classList.remove('fa-chevron-up');
+        chevron.classList.add('fa-chevron-down');
+      }
+      
+      // Need to refresh editor after resizing
+      editor.refresh();
+    });
+    
+    // Save notes content to localStorage when changed
+    notesEditor.addEventListener('input', () => {
+      localStorage.setItem('codeer-notes', notesEditor.value);
+    });
+    
+    // Load saved notes on startup
+    if (localStorage.getItem('codeer-notes')) {
+      notesEditor.value = localStorage.getItem('codeer-notes');
+    }
+    
+    // Handle classroom mode for notes
+    const originalToggleLayout = toggleLayout;
+    toggleLayout = function(mode) {
+      originalToggleLayout(mode);
+      
+      if (mode === 'classroom') {
+        // In classroom mode, hide the notes by default
+        notesContainer.classList.add('hidden');
+      } else {
+        // In other modes, show the notes
+        notesContainer.classList.remove('hidden');
+      }
+    };
+
+    // Previous Output Management
+    // Initialize the previous outputs container
+    const previousOutputsList = document.getElementById('previous-outputs-list');
+    const outputCount = document.getElementById('output-count');
+    const previousOutputContainer = document.getElementById('previous-output-container');
+    const togglePreviousBtn = document.getElementById('toggle-previous');
+    const previousOutputsContent = document.getElementById('previous-outputs-content');
+    
+    // Load previous outputs from localStorage
+    function loadPreviousOutputs() {
+      if (localStorage.getItem('previous-outputs')) {
+        try {
+          const outputs = JSON.parse(localStorage.getItem('previous-outputs'));
+          previousOutputsList.innerHTML = '';
+          
+          if (outputs.length === 0) {
+            previousOutputsList.innerHTML = `
+              <div class="empty-state p-4 text-center text-gray-400">
+                <i class="fas fa-code text-5xl mb-2"></i>
+                <p>Run your code to see outputs here</p>
+              </div>
+            `;
+            outputCount.textContent = '0';
+          } else {
+            outputs.forEach(output => {
+              addToOutputHistory(output.html, output.timestamp, output.language, false);
+            });
+            outputCount.textContent = outputs.length;
+          }
+        } catch (e) {
+          console.error('Error loading previous outputs', e);
+          previousOutputsList.innerHTML = `
+            <div class="empty-state p-4 text-center text-gray-400">
+              <i class="fas fa-code text-5xl mb-2"></i>
+              <p>Run your code to see outputs here</p>
+            </div>
+          `;
+          outputCount.textContent = '0';
+        }
+      }
+    }
+    
+    // Save output to storage
+    function saveOutputToStorage(html, language) {
+      let outputs = [];
+      if (localStorage.getItem('previous-outputs')) {
+        try {
+          outputs = JSON.parse(localStorage.getItem('previous-outputs'));
+        } catch (e) {
+          console.error('Error parsing previous outputs', e);
+        }
+      }
+      
+      // Add new output
+      outputs.unshift({
+        html: html,
+        timestamp: new Date().toISOString(),
+        language: language
+      });
+      
+      // Limit to 20 outputs
+      if (outputs.length > 20) {
+        outputs = outputs.slice(0, 20);
+      }
+      
+      localStorage.setItem('previous-outputs', JSON.stringify(outputs));
+    }
+    
+    // Add output to history
+    function addToOutputHistory(outputHtml, timestamp, language, saveToStorage = true) {
+      const languageNames = {
+        71: 'Python',
+        63: 'JavaScript',
+        62: 'Java',
+        50: 'C',
+        54: 'C++',
+        86: 'Ruby',
+        74: 'PHP',
+        52: 'C#',
+        78: 'Kotlin'
+      };
+      
+      const langName = languageNames[language] || 'Unknown';
+      const date = new Date(timestamp || new Date());
+      const formattedTime = date.toLocaleTimeString();
+      
+      // Create output element
+      const outputElement = document.createElement('div');
+      outputElement.className = 'previous-output p-4 border-b border-dark-gray';
+      
+      // Add header with language and timestamp
+      const outputHeader = document.createElement('div');
+      outputHeader.className = 'flex justify-between text-xs text-gray-400 mb-2';
+      outputHeader.innerHTML = `
+        <div>
+          <span class="font-semibold">${langName}</span>
+        </div>
+        <div class="flex gap-2">
+          <span>${formattedTime}</span>
+          <button class="copy-output text-gray-400 hover:text-primary" title="Copy Output">
+            <i class="fas fa-copy"></i>
+          </button>
+        </div>
+      `;
+      
+      // Add output content
+      const outputContent = document.createElement('div');
+      outputContent.className = 'output-content';
+      outputContent.innerHTML = outputHtml;
+      
+      outputElement.appendChild(outputHeader);
+      outputElement.appendChild(outputContent);
+      
+      // Add copy functionality
+      outputElement.querySelector('.copy-output').addEventListener('click', function() {
+        const textToCopy = outputContent.textContent;
+        navigator.clipboard.writeText(textToCopy).then(() => {
+          this.innerHTML = '<i class="fas fa-check"></i>';
+          setTimeout(() => {
+            this.innerHTML = '<i class="fas fa-copy"></i>';
+          }, 2000);
+        });
+      });
+      
+      // Add to DOM
+      previousOutputsList.prepend(outputElement);
+      
+      // Update count
+      const currentCount = parseInt(outputCount.textContent, 10) || 0;
+      outputCount.textContent = currentCount + 1;
+      
+      // Remove empty state if it exists
+      const emptyState = previousOutputsList.querySelector('.empty-state');
+      if (emptyState) emptyState.remove();
+      
+      // Save to storage if needed
+      if (saveToStorage) {
+        saveOutputToStorage(outputHtml, language);
+      }
+      
+      // Show the previous outputs section if hidden
+      previousOutputsContent.classList.remove('hidden');
+      togglePreviousBtn.classList.remove('fa-chevron-down');
+      togglePreviousBtn.classList.add('fa-chevron-up');
+    }
+    
+    // Toggle previous outputs visibility
+    togglePreviousBtn.addEventListener('click', () => {
+      previousOutputsContent.classList.toggle('hidden');
+      togglePreviousBtn.classList.toggle('fa-chevron-down');
+      togglePreviousBtn.classList.toggle('fa-chevron-up');
+    });
+    
+    // Clear all outputs
+    document.getElementById('clear-all-outputs').addEventListener('click', () => {
+      if (confirm('Are you sure you want to clear all previous outputs?')) {
+        previousOutputsList.innerHTML = `
+          <div class="empty-state p-4 text-center text-gray-400">
+            <i class="fas fa-code text-5xl mb-2"></i>
+            <p>Run your code to see outputs here</p>
+          </div>
+        `;
+        outputCount.textContent = '0';
+        localStorage.removeItem('previous-outputs');
+      }
+    });
+    
+    // Load previous outputs on startup
+    loadPreviousOutputs();
+
+    // Initialize Settings
+    applySettings();
+    
+    // Set up auto-save if enabled
+    if (localStorage.getItem('autoSave') === 'true') {
+      window.autoSaveInterval = setInterval(() => {
+        saveCurrentFileContent();
+      }, 30000); // Save every 30 seconds
+    }
+  </script>
+</body>
+</html>
