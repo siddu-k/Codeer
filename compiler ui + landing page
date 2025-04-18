@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codeer.org - Online Compiler</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
+  <!-- CodeMirror Language Modes -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/clike/clike.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/ruby/ruby.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/php/php.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/go/go.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/rust/rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/swift/swift.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/clike/clike.min.js" data-mode="csharp"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/clike/clike.min.js" data-mode="kotlin"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/haskell/haskell.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/lua/lua.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/perl/perl.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/r/r.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/fortran/fortran.min.js"></script>
+  <!-- CodeMirror Themes -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/monokai.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/dracula.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/solarized.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/nord.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/cobalt.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/blackboard.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/mdn-like.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Fira Code', monospace;
+      background: linear-gradient(135deg, #1a202c, #2d3748);
+      color: #e2e8f0;
+      overflow-x: hidden;
+      height: 100vh;
+    }
+    #landing-page, #compiler-page {
+      min-height: 100vh;
+    }
+    .code-block {
+      background: #2d3748;
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .code-block:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+    }
+    #editor-container, #terminal-container {
+      background: #2d3748;
+      border: 1px solid #4a5568;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .resizer {
+      background: #4a5568;
+      cursor: col-resize;
+      width: 5px;
+      transition: background 0.2s;
+    }
+    .resizer:hover {
+      background: #68d391;
+    }
+    .floating-terminal {
+      position: absolute;
+      background: #2d3748;
+      border: 1px solid #4a5568;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      resize: both;
+      overflow: auto;
+      min-width: 200px;
+      min-height: 100px;
+      z-index: 10;
+    }
+    .settings-modal {
+      background: #2d3748;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 90%;
+    }
+    .tab-btn.active {
+      background-color: #68d391 !important;
+    }
+    .cm-editor {
+      height: 100%;
+    }
+    #compiler-page {
+      height: 100%;
+    }
+    #editor-terminal-container {
+      height: calc(100% - 60px);
+    }
+    @media (max-width: 768px) {
+      #editor-container, #terminal-container {
+        width: 100% !important;
+      }
+      .resizer {
+        display: none;
+      }
+      #compiler-page .flex-1 {
+        flex: none;
+      }
+      .container {
+        transform: scale(0.8);
+      }
+    }
+    /* Uiverse.io Console Window Styles (Modified for Dark Theme) */
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+    }
+    .window {
+      position: relative;
+      height: 200px;
+      width: 300px;
+      background-color: #2d3748;
+      border: 2px solid #4a5568;
+      border-radius: 15px;
+      overflow: hidden;
+    }
+    .window-title {
+      height: 30px;
+      background-color: #4a5568;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+    }
+    .window-title p {
+      color: #e2e8f0;
+      font-weight: bold;
+      margin: 0;
+      text-align: left;
+    }
+    .window-buttons {
+      display: flex;
+      align-items: center;
+    }
+    .window-button {
+      width: 10px;
+      height: 10px;
+      border-radius: 5px;
+      margin: 5px;
+      transition: background-color 0.2s ease;
+    }
+    .window-button.close {
+      background-color: #f56565;
+    }
+    .window-button.close:hover {
+      background-color: #c53030;
+      cursor: pointer;
+    }
+    .window-button.reduce {
+      background-color: #ecc94b;
+    }
+    .window-button.reduce:hover {
+      background-color: #b7791f;
+      cursor: pointer;
+    }
+    .window-button.fullscreen {
+      background-color: #48bb78;
+    }
+    .window-button.fullscreen:hover {
+      background-color: #2f855a;
+      cursor: pointer;
+    }
+    .console {
+      width: 100%;
+      height: calc(100% - 30px);
+      background-color: #1a202c;
+      color: #e2e8f0;
+      overflow: auto;
+    }
+    .console pre {
+      margin: 0;
+      padding: 5px;
+      font-size: 14px;
+    }
+    .console pre code {
+      color: #68d391;
+      outline: none;
+    }
+    .console::-webkit-scrollbar {
+      width: 8px;
+    }
+    .console::-webkit-scrollbar-track {
+      background-color: #4a5568;
+    }
+    .console::-webkit-scrollbar-thumb {
+      background-color: #68d391;
+      border-radius: 10px;
+      border: 2px solid #4a5568;
+    }
+    .console::-webkit-scrollbar-thumb:hover {
+      background-color: #38a169;
+    }
+  </style>
+</head>
+<body>
+  <!-- Landing Page -->
+  <div id="landing-page" class="flex flex-col">
+    <!-- Hero Section -->
+    <section class="text-center py-16 px-4 bg-gradient-to-r from-gray-900 via-green-900 to-gray-900">
+      <h1 class="text-5xl md:text-6xl font-bold text-green-400 animate-bounce">Codeer.org: Code, Compile, Create!</h1>
+      <p class="text-xl md:text-2xl mt-4 text-gray-300 animate-pulse">The ultimate free compiler for developers and students.</p>
+      <div class="container">
+        <div class="window">
+          <div class="window-title">
+            <p>Console Window</p>
+            <div class="window-buttons">
+              <div class="window-button fullscreen"></div>
+              <div class="window-button reduce"></div>
+              <div class="window-button close"></div>
+            </div>
+          </div>
+          <div class="console">
+            <pre><code id="welcome-code"></code></pre>
+          </div>
+        </div>
+      </div>
+      <button id="start-coding" class="mt-6 bg-green-500 text-white py-3 px-8 rounded-lg hover:bg-green-600 transition transform hover:scale-105">Start Coding</button>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-16 px-4 bg-gray-800">
+      <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-100">Why Choose Codeer.org?</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8 max-w-6xl mx-auto">
+        <div class="code-block p-6">
+          <h3 class="text-xl font-semibold text-green-400">Multi-Language Support</h3>
+          <p class="mt-2 text-gray-300">Compile code in Python, JavaScript, Java, and more with Judge0 API.</p>
+        </div>
+        <div class="code-block p-6">
+          <h3 class="text-xl font-semibold text-green-400">Resizable Interface</h3>
+          <p class="mt-2 text-gray-300">Drag borders to customize your coding and terminal areas.</p>
+        </div>
+        <div class="code-block p-6">
+          <h3 class="text-xl font-semibold text-green-400">Personalized UI</h3>
+          <p class="mt-2 text-gray-300">Adjust UI size, font, and pick from 9+ stunning themes.</p>
+        </div>
+        <div class="code-block p-6">
+          <h3 class="text-xl font-semibold text-green-400">Classroom Mode</h3>
+          <p class="mt-2 text-gray-300">Full-screen coding with a floating, resizable terminal.</p>
+        </div>
+        <div class="code-block p-6">
+          <h3 class="text-xl font-semibold text-green-400">Code Management</h3>
+          <p class="mt-2 text-gray-300">Easily copy, delete, download, or run your code.</p>
+        </div>
+        <div class="code-block p-6">
+          <h3 class="text-xl font-semibold text-green-400">Completely Free</h3>
+          <p class="mt-2 text-gray-300">Access all features at no cost, forever.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Free Offerings Section -->
+    <section class="py-16 px-4 bg-gray-900">
+      <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-100">What You Get for Free</h2>
+      <ul class="mt-8 max-w-4xl mx-auto text-gray-300 list-disc list-inside text-lg">
+        <li>Unlimited code compilation across all supported languages.</li>
+        <li>Access to 9+ editor themes and customizable layouts.</li>
+        <li>Resizable coding and terminal areas, plus classroom view mode.</li>
+        <li>Seamless code copy, delete, and download functionalities.</li>
+      </ul>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 px-4 text-center text-gray-400 bg-gray-800">
+      <p>© 2025 Codeer.org. All rights reserved.</p>
+      <div class="mt-4">
+        <a href="#" class="text-green-400 hover:underline mx-2">About</a>
+        <a href="#" class="text-green-400 hover:underline mx-2">Contact</a>
+        <a href="#" class="text-green-400 hover:underline mx-2">Privacy Policy</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Compiler Page -->
+  <div id="compiler-page" class="hidden flex flex-col h-screen p-4">
+    <div class="flex flex-wrap justify-between mb-4 gap-2">
+      <select id="language-select" class="bg-gray-700 text-white p-2 rounded w-64">
+        <!-- Populated locally -->
+      </select>
+      <div class="flex gap-2 flex-wrap">
+        <button id="run-btn" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600" title="Run Code">Run</button>
+        <button id="copy-btn" class="bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-500" title="Copy Code">Copy</button>
+        <button id="delete-btn" class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600" title="Delete Code">Delete</button>
+        <button id="download-btn" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" title="Download Code">Download</button>
+        <button id="settings-btn" class="bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-500" title="Settings">Settings</button>
+      </div>
+    </div>
+    <div id="editor-terminal-container" class="flex flex-1 overflow-hidden h-full">
+      <div id="editor-container" class="flex-1 h-full">
+        <textarea id="code-editor"></textarea>
+      </div>
+      <div class="resizer" id="resizer"></div>
+      <div id="terminal-container" class="flex-1 relative h-full">
+        <button id="hide-terminal" class="absolute top-2 right-2 bg-gray-600 text-white py-1 px-2 rounded hover:bg-gray-500" title="Hide Terminal">Hide</button>
+        <pre id="terminal-output" class="p-4 text-gray-200 h-full"></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="settings-modal p-6">
+      <div class="flex mb-4">
+        <button class="tab-btn bg-green-500 text-white py-2 px-4 rounded-t active" data-tab="general">General</button>
+        <button class="tab-btn bg-gray-600 text-white py-2 px-4 rounded-t" data-tab="appearance">Appearance</button>
+        <button class="tab-btn bg-gray-600 text-white py-2 px-4 rounded-t" data-tab="layout">Layout</button>
+      </div>
+      <div id="general-tab" class="tab-content">
+        <h3 class="text-xl font-semibold text-green-400">General</h3>
+        <div class="mt-4">
+          <label class="block text-gray-300">UI Size</label>
+          <input id="ui-size-slider" type="range" min="80" max="120" value="100" class="w-full">
+          <span id="ui-size-value" class="text-gray-300">100%</span>
+        </div>
+        <div class="mt-4">
+          <label class="block text-gray-300">Font Size</label>
+          <input id="font-size-slider" type="range" min="12" max="24" value="16" class="w-full">
+          <span id="font-size-value" class="text-gray-300">16px</span>
+        </div>
+      </div>
+      <div id="appearance-tab" class="tab-content hidden">
+        <h3 class="text-xl font-semibold text-green-400">Appearance</h3>
+        <div class="mt-4">
+          <label class="block text-gray-300">Editor Theme</label>
+          <select id="theme-select" class="bg-gray-700 text-white p-2 rounded w-full">
+            <option value="monokai">Monokai</option>
+            <option value="dracula">Dracula</option>
+            <option value="solarized-dark">Solarized Dark</option>
+            <option value="nord">Nord</option>
+            <option value="cobalt">Cobalt</option>
+            <option value="blackboard">Blackboard</option>
+            <option value="mdn-like">MDN Like</option>
+            <option value="gruvbox-dark">Gruvbox Dark</option>
+            <option value="tokyo-night">Tokyo Night</option>
+          </select>
+        </div>
+      </div>
+      <div id="layout-tab" class="tab-content hidden">
+        <h3 class="text-xl font-semibold text-green-400">Layout</h3>
+        <div class="mt-4">
+          <label class="block text-gray-300">Layout Mode</label>
+          <select id="layout-select" class="bg-gray-700 text-white p-2 rounded w-full">
+            <option value="default">Default (Split View)</option>
+            <option value="classroom">Classroom View</option>
+          </select>
+        </div>
+      </div>
+      <button id="close-settings" class="mt-4 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">Close</button>
+    </div>
+  </div>
+
+  <script>
+    // Welcome Code for Landing Page
+    const welcomeCodes = [
+      `print("Welcome to Codeer.org! Write your code here.") # Python`,
+      `console.log("Welcome to Codeer.org! Write your code here."); // JavaScript`,
+      `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Welcome to Codeer.org! Write your code here.");\n    }\n} // Java`,
+      `#include <stdio.h>\nint main() {\n    printf("Welcome to Codeer.org! Write your code here.\\n");\n    return 0;\n} // C`,
+      `#include <iostream>\nusing namespace std;\nint main() {\n    cout << "Welcome to Codeer.org! Write your code here." << endl;\n    return 0;\n} // C++`,
+      `puts "Welcome to Codeer.org! Write your code here." # Ruby`,
+      `<?php\necho "Welcome to Codeer.org! Write your code here.";\n?> // PHP`,
+      `class Program {\n    static void Main() {\n        System.Console.WriteLine("Welcome to Codeer.org! Write your code here.");\n    }\n} // C#`,
+      `fun main() {\n    println("Welcome to Codeer.org! Write your code here.")\n} // Kotlin`
+    ];
+    document.getElementById('welcome-code').textContent = welcomeCodes[Math.floor(Math.random() * welcomeCodes.length)];
+
+    // Locally Defined Languages and Default Starter Code (Based on Your API)
+    const languages = [
+      { id: 45, name: 'Assembly (NASM 2.14.02)' },
+      { id: 46, name: 'Bash (5.0.0)' },
+      { id: 47, name: 'Basic (FBC 1.07.1)' },
+      { id: 75, name: 'C (Clang 7.0.1)' },
+      { id: 76, name: 'C++ (Clang 7.0.1)' },
+      { id: 48, name: 'C (GCC 7.4.0)' },
+      { id: 52, name: 'C++ (GCC 7.4.0)' },
+      { id: 49, name: 'C (GCC 8.3.0)' },
+      { id: 53, name: 'C++ (GCC 8.3.0)' },
+      { id: 50, name: 'C (GCC 9.2.0)' },
+      { id: 54, name: 'C++ (GCC 9.2.0)' },
+      { id: 86, name: 'Clojure (1.10.1)' },
+      { id: 51, name: 'C# (Mono 6.6.0.161)' },
+      { id: 77, name: 'COBOL (GnuCOBOL 2.2)' },
+      { id: 55, name: 'Common Lisp (SBCL 2.0.0)' },
+      { id: 56, name: 'D (DMD 2.089.1)' },
+      { id: 57, name: 'Elixir (1.9.4)' },
+      { id: 58, name: 'Erlang (OTP 22.2)' },
+      { id: 44, name: 'Executable' },
+      { id: 87, name: 'F# (.NET Core SDK 3.1.202)' },
+      { id: 59, name: 'Fortran (GFortran 9.2.0)' },
+      { id: 60, name: 'Go (1.13.5)' },
+      { id: 88, name: 'Groovy (3.0.3)' },
+      { id: 61, name: 'Haskell (GHC 8.8.1)' },
+      { id: 62, name: 'Java (OpenJDK 13.0.1)' },
+      { id: 63, name: 'JavaScript (Node.js 12.14.0)' },
+      { id: 78, name: 'Kotlin (1.3.70)' },
+      { id: 64, name: 'Lua (5.3.5)' },
+      { id: 89, name: 'Multi-file program' },
+      { id: 79, name: 'Objective-C (Clang 7.0.1)' },
+      { id: 65, name: 'OCaml (4.09.0)' },
+      { id: 66, name: 'Octave (5.1.0)' },
+      { id: 67, name: 'Pascal (FPC 3.0.4)' },
+      { id: 85, name: 'Perl (5.28.1)' },
+      { id: 68, name: 'PHP (7.4.1)' },
+      { id: 43, name: 'Plain Text' },
+      { id: 69, name: 'Prolog (GNU Prolog 1.4.5)' },
+      { id: 70, name: 'Python (2.7.17)' },
+      { id: 71, name: 'Python (3.8.1)' },
+      { id: 80, name: 'R (4.0.0)' },
+      { id: 72, name: 'Ruby (2.7.0)' },
+      { id: 73, name: 'Rust (1.40.0)' },
+      { id: 81, name: 'Scala (2.13.2)' },
+      { id: 82, name: 'SQL (SQLite 3.27.2)' },
+      { id: 83, name: 'Swift (5.2.3)' },
+      { id: 74, name: 'TypeScript (3.7.4)' },
+      { id: 84, name: 'Visual Basic.Net (vbnc 0.0.0.5943)' }
+    ];
+    const defaultPrograms = {
+      45: `; Assembly (NASM)\nsection .data\n    msg db "Hello", 10\n    len equ $ - msg\nsection .text\nglobal _start\n_start:\n    mov eax, 4\n    mov ebx, 1\n    mov ecx, msg\n    mov edx, len\n    int 0x80\n    mov eax, 1\n    xor ebx, ebx\n    int 0x80`,
+      46: `echo "Hello"`, // Bash
+      47: `PRINT "Hello"`, // Basic
+      75: `#include <stdio.h>\nint main() {\n    printf("Hello\\n");\n    return 0;\n}`, // C (Clang)
+      76: `#include <iostream>\nusing namespace std;\nint main() {\n    cout << "Hello" << endl;\n    return 0;\n}`, // C++ (Clang)
+      48: `#include <stdio.h>\nint main() {\n    printf("Hello\\n");\n    return 0;\n}`, // C (GCC 7.4.0)
+      52: `#include <iostream>\nusing namespace std;\nint main() {\n    cout << "Hello" << endl;\n    return 0;\n}`, // C++ (GCC 7.4.0)
+      49: `#include <stdio.h>\nint main() {\n    printf("Hello\\n");\n    return 0;\n}`, // C (GCC 8.3.0)
+      53: `#include <iostream>\nusing namespace std;\nint main() {\n    cout << "Hello" << endl;\n    return 0;\n}`, // C++ (GCC 8.3.0)
+      50: `#include <stdio.h>\nint main() {\n    printf("Hello\\n");\n    return 0;\n}`, // C (GCC 9.2.0)
+      54: `#include <iostream>\nusing namespace std;\nint main() {\n    cout << "Hello" << endl;\n    return 0;\n}`, // C++ (GCC 9.2.0)
+      86: `(println "Hello")`, // Clojure
+      51: `class Program {\n    static void Main() {\n        System.Console.WriteLine("Hello");\n    }\n}`, // C#
+      77: `IDENTIFICATION DIVISION.\nPROGRAM-ID. Hello.\nPROCEDURE DIVISION.\n    DISPLAY "Hello".\n    STOP RUN.`, // COBOL
+      55: `(write-line "Hello")`, // Common Lisp
+      56: `import std.stdio;\nvoid main() {\n    writeln("Hello");\n}`, // D
+      57: `IO.puts("Hello")`, // Elixir
+      58: `io:format("Hello~n").`, // Erlang
+      44: ``, // Executable (no default)
+      87: `printfn "Hello"`, // F#
+      59: `program hello\n    print *, "Hello"\nend program hello`, // Fortran
+      60: `package main\nimport "fmt"\nfunc main() {\n    fmt.Println("Hello")\n}`, // Go
+      88: `println "Hello"`, // Groovy
+      61: `main :: IO ()\nmain = putStrLn "Hello"`, // Haskell
+      62: `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello");\n    }\n}`, // Java
+      63: `console.log("Hello");`, // JavaScript
+      78: `fun main() {\n    println("Hello")\n}`, // Kotlin
+      64: `print("Hello\\n")`, // Lua
+      89: ``, // Multi-file program (no default)
+      79: `#import <Foundation/Foundation.h>\nint main() {\n    NSLog(@"Hello");\n    return 0;\n}`, // Objective-C
+      65: `print_endline "Hello";;`, // OCaml
+      66: `disp("Hello")`, // Octave
+      67: `program HelloWorld;\nbegin\n  writeln('Hello');\nend.`, // Pascal
+      85: `print "Hello\\n";`, // Perl
+      68: `<?php\necho "Hello";\n?>`, // PHP
+      43: `Hello`, // Plain Text
+      69: `:- write('Hello'), nl.`, // Prolog
+      70: `print "Hello"`, // Python 2
+      71: `print("Hello")`, // Python 3
+      80: `print("Hello")`, // R
+      72: `puts "Hello"`, // Ruby
+      73: `fn main() {\n    println!("Hello");\n}`, // Rust
+      81: `object Main extends App {\n  println("Hello")\n}`, // Scala
+      82: `SELECT 'Hello';`, // SQL
+      83: `print("Hello")`, // Swift
+      74: `console.log("Hello");`, // TypeScript
+      84: `Module Hello\n    Sub Main()\n        Console.WriteLine("Hello")\n    End Sub\nEnd Module`, // VB.Net
+    };
+
+    // CodeMirror Editor with Enhanced Syntax Highlighting
+    const editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
+      lineNumbers: true,
+      theme: localStorage.getItem('editorTheme') || 'monokai',
+      mode: 'python',
+      matchBrackets: true,
+      autoCloseBrackets: true,
+      highlightSelectionMatches: true,
+      styleActiveLine: true
+    });
+    editor.setValue(defaultPrograms[71]); // Default to Python 3 on load
+
+    // Apply Saved Settings
+    const applySettings = () => {
+      const uiSize = localStorage.getItem('uiSize') || '100';
+      const fontSize = localStorage.getItem('fontSize') || '16';
+      const theme = localStorage.getItem('editorTheme') || 'monokai';
+      const layout = localStorage.getItem('layout') || 'default';
+
+      document.getElementById('ui-size-slider').value = uiSize;
+      document.getElementById('ui-size-value').textContent = `${uiSize}%`;
+      document.querySelectorAll('button:not(.window-button), select, input').forEach(el => {
+        el.style.transform = `scale(${uiSize / 100})`;
+      });
+
+      document.getElementById('font-size-slider').value = fontSize;
+      document.getElementById('font-size-value').textContent = `${fontSize}px`;
+      editor.getWrapperElement().style.fontSize = `${fontSize}px`;
+      document.getElementById('terminal-output').style.fontSize = `${fontSize}px`;
+
+      document.getElementById('theme-select').value = theme;
+      editor.setOption('theme', theme);
+
+      document.getElementById('layout-select').value = layout;
+      toggleLayout(layout);
+    };
+
+    // Page Navigation
+    document.getElementById('start-coding').addEventListener('click', () => {
+      document.getElementById('landing-page').classList.add('hidden');
+      document.getElementById('compiler-page').classList.remove('hidden');
+      editor.refresh();
+    });
+
+    // Populate Language Dropdown Locally
+    const select = document.getElementById('language-select');
+    const fragment = document.createDocumentFragment();
+    languages.forEach(lang => {
+      const option = document.createElement('option');
+      option.value = lang.id;
+      option.textContent = lang.name;
+      fragment.appendChild(option);
+    });
+    select.appendChild(fragment);
+    select.value = '71'; // Default to Python 3
+
+    // Language Change Handler
+    document.getElementById('language-select').addEventListener('change', (e) => {
+      const languageId = e.target.value;
+      editor.setValue(defaultPrograms[languageId] || '');
+      const modeMap = {
+        45: 'text/x-nasm', // Assembly
+        46: 'shell', // Bash
+        47: 'text/x-basic', // Basic
+        75: 'text/x-csrc', 76: 'text/x-c++src', 48: 'text/x-csrc', 52: 'text/x-c++src', 
+        49: 'text/x-csrc', 53: 'text/x-c++src', 50: 'text/x-csrc', 54: 'text/x-c++src', // C, C++
+        86: 'clojure', // Clojure
+        51: 'text/x-csharp', // C#
+        77: 'cobol', // COBOL
+        55: 'commonlisp', // Common Lisp
+        56: 'd', // D
+        57: 'elixir', // Elixir
+        58: 'erlang', // Erlang
+        44: 'text/plain', // Executable
+        87: 'text/x-fsharp', // F#
+        59: 'fortran', // Fortran
+        60: 'go', // Go
+        88: 'groovy', // Groovy
+        61: 'haskell', // Haskell
+        62: 'text/x-java', // Java
+        63: 'javascript', // JavaScript
+        78: 'text/x-kotlin', // Kotlin
+        64: 'lua', // Lua
+        89: 'text/plain', // Multi-file program
+        79: 'text/x-objectivec', // Objective-C
+        65: 'ocaml', // OCaml
+        66: 'octave', // Octave
+        67: 'text/x-pascal', // Pascal
+        85: 'perl', // Perl
+        68: 'php', // PHP
+        43: 'text/plain', // Plain Text
+        69: 'prolog', // Prolog
+        70: 'python', 71: 'python', // Python
+        80: 'r', // R
+        72: 'ruby', // Ruby
+        73: 'rust', // Rust
+        81: 'text/x-scala', // Scala
+        82: 'sql', // SQL
+        83: 'swift', // Swift
+        74: 'javascript', // TypeScript
+        84: 'text/x-vb' // Visual Basic.Net
+      };
+      editor.setOption('mode', modeMap[languageId] || 'text');
+    });
+
+    // Optimized Run Code
+    document.getElementById('run-btn').addEventListener('click', async () => {
+      const code = editor.getValue().trim();
+      const languageId = document.getElementById('language-select').value;
+      if (!code || !languageId) {
+        document.getElementById('terminal-output').textContent = 'Please enter code and select a language.';
+        return;
+      }
+      document.getElementById('terminal-container').classList.remove('hidden');
+      document.getElementById('terminal-output').textContent = 'Running...';
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
+        const response = await fetch('https://code.sriox.com/submissions?base64_encoded=false&wait=true', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ source_code: code, language_id: languageId }),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) throw new Error('Compilation failed');
+        const data = await response.json();
+        const output = data.stdout || data.stderr || data.compile_output || 'No output';
+        document.getElementById('terminal-output').textContent = output;
+      } catch (error) {
+        document.getElementById('terminal-output').textContent = `Error: ${error.name === 'AbortError' ? 'Timeout after 10s' : error.message}`;
+      }
+    });
+
+    // Copy Code
+    document.getElementById('copy-btn').addEventListener('click', () => {
+      navigator.clipboard.writeText(editor.getValue()).then(() => {
+        alert('Code copied to clipboard!');
+      }).catch(() => {
+        alert('Failed to copy code.');
+      });
+    });
+
+    // Delete Code
+    document.getElementById('delete-btn').addEventListener('click', () => {
+      if (confirm('Are you sure you want to clear the code?')) {
+        editor.setValue('');
+        document.getElementById('terminal-output').textContent = '';
+      }
+    });
+
+    // Download Code
+    document.getElementById('download-btn').addEventListener('click', () => {
+      const code = editor.getValue();
+      const languageId = document.getElementById('language-select').value;
+      const extensions = {
+        45: 'asm', 46: 'sh', 47: 'bas', 75: 'c', 76: 'cpp', 48: 'c', 52: 'cpp',
+        49: 'c', 53: 'cpp', 50: 'c', 54: 'cpp', 86: 'clj', 51: 'cs', 77: 'cob',
+        55: 'lisp', 56: 'd', 57: 'ex', 58: 'erl', 44: 'bin', 87: 'fs', 59: 'f',
+        60: 'go', 88: 'groovy', 61: 'hs', 62: 'java', 63: 'js', 78: 'kt', 64: 'lua',
+        89: 'txt', 79: 'm', 65: 'ml', 66: 'm', 67: 'pas', 85: 'pl', 68: 'php',
+        43: 'txt', 69: 'plg', 70: 'py', 71: 'py', 80: 'r', 72: 'rb', 73: 'rs',
+        81: 'scala', 82: 'sql', 83: 'swift', 74: 'ts', 84: 'vb'
+      };
+      const extension = extensions[languageId] || 'txt';
+      const blob = new Blob([code], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `code.${extension}`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // Hide Terminal
+    document.getElementById('hide-terminal').addEventListener('click', () => {
+      document.getElementById('terminal-container').classList.add('hidden');
+    });
+
+    // Resizer
+    const resizer = document.getElementById('resizer');
+    resizer.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      document.addEventListener('mousemove', resize);
+      document.addEventListener('mouseup', () => {
+        document.removeEventListener('mousemove', resize);
+      });
+      function resize(e) {
+        const editorContainer = document.getElementById('editor-container');
+        const terminalContainer = document.getElementById('terminal-container');
+        const totalWidth = editorContainer.parentElement.offsetWidth;
+        const newEditorWidth = e.clientX - editorContainer.offsetLeft;
+        if (newEditorWidth > 200 && newEditorWidth < totalWidth - 200) {
+          editorContainer.style.width = `${newEditorWidth}px`;
+          terminalContainer.style.width = `${totalWidth - newEditorWidth - resizer.offsetWidth}px`;
+        }
+      }
+    });
+
+    // Settings Modal
+    document.getElementById('settings-btn').addEventListener('click', () => {
+      document.getElementById('settings-modal').classList.remove('hidden');
+    });
+    document.getElementById('close-settings').addEventListener('click', () => {
+      document.getElementById('settings-modal').classList.add('hidden');
+    });
+
+    // Tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.replace('bg-green-500', 'bg-gray-600'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+        btn.classList.replace('bg-gray-600', 'bg-green-500');
+        document.getElementById(`${btn.dataset.tab}-tab`).classList.remove('hidden');
+      });
+    });
+
+    // UI Size Slider
+    document.getElementById('ui-size-slider').addEventListener('input', (e) => {
+      const size = e.target.value;
+      document.getElementById('ui-size-value').textContent = `${size}%`;
+      document.querySelectorAll('button:not(.window-button), select, input').forEach(el => {
+        el.style.transform = `scale(${size / 100})`;
+      });
+      localStorage.setItem('uiSize', size);
+    });
+
+    // Font Size Slider
+    document.getElementById('font-size-slider').addEventListener('input', (e) => {
+      const size = e.target.value;
+      document.getElementById('font-size-value').textContent = `${size}px`;
+      editor.getWrapperElement().style.fontSize = `${size}px`;
+      document.getElementById('terminal-output').style.fontSize = `${size}px`;
+      localStorage.setItem('fontSize', size);
+    });
+
+    // Theme Selector
+    document.getElementById('theme-select').addEventListener('change', (e) => {
+      const theme = e.target.value;
+      editor.setOption('theme', theme);
+      localStorage.setItem('editorTheme', theme);
+      const bgColors = {
+        'monokai': '#272822',
+        'dracula': '#282a36',
+        'solarized-dark': '#002b36',
+        'nord': '#2e3440',
+        'cobalt': '#002240',
+        'blackboard': '#1a1a1a',
+        'mdn-like': '#1b1b1a',
+        'gruvbox-dark': '#282828',
+        'tokyo-night': '#1a1b26'
+      };
+      document.body.style.background = bgColors[theme] || '#1a202c';
+      document.querySelectorAll('.code-block, #editor-container, #terminal-container, .settings-modal').forEach(el => {
+        el.style.background = bgColors[theme] || '#2d3748';
+      });
+    });
+
+    // Layout Selector
+    const toggleLayout = (mode) => {
+      const editorContainer = document.getElementById('editor-container');
+      const terminalContainer = document.getElementById('terminal-container');
+      const resizer = document.getElementById('resizer');
+      const editorTerminalContainer = document.getElementById('editor-terminal-container');
+      const existingRunBtn = document.querySelector('.fixed-run-btn');
+      const existingExitBtn = document.querySelector('.exit-classroom-btn');
+      if (existingRunBtn) existingRunBtn.remove();
+      if (existingExitBtn) existingExitBtn.remove();
+
+      if (mode === 'classroom') {
+        editorTerminalContainer.classList.remove('flex');
+        editorContainer.classList.add('fixed', 'inset-0', 'm-0', 'p-0');
+        editorContainer.style.width = '100%';
+        editorContainer.style.height = '100%';
+        terminalContainer.classList.add('floating-terminal');
+        terminalContainer.style.width = '300px';
+        terminalContainer.style.height = '200px';
+        terminalContainer.style.left = '50px';
+        terminalContainer.style.top = '50px';
+        resizer.style.display = 'none';
+
+        let isDragging = false;
+        let currentX, currentY, xOffset = 50, yOffset = 50;
+        terminalContainer.addEventListener('mousedown', (e) => {
+          if (e.target === document.getElementById('hide-terminal')) return;
+          isDragging = true;
+          currentX = e.clientX - xOffset;
+          currentY = e.clientY - yOffset;
+          terminalContainer.style.cursor = 'grabbing';
+        });
+        document.addEventListener('mousemove', (e) => {
+          if (isDragging) {
+            xOffset = e.clientX - currentX;
+            yOffset = e.clientY - currentY;
+            terminalContainer.style.left = `${xOffset}px`;
+            terminalContainer.style.top = `${yOffset}px`;
+          }
+        });
+        document.addEventListener('mouseup', () => {
+          isDragging = false;
+          terminalContainer.style.cursor = 'grab';
+        });
+
+        const runBtn = document.createElement('button');
+        runBtn.textContent = 'Run';
+        runBtn.className = 'fixed-run-btn fixed bottom-4 right-4 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600';
+        runBtn.addEventListener('click', () => document.getElementById('run-btn').click());
+        document.body.appendChild(runBtn);
+
+        const exitBtn = document.createElement('button');
+        exitBtn.textContent = 'Exit Classroom';
+        exitBtn.className = 'exit-classroom-btn fixed top-4 right-4 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600';
+        exitBtn.addEventListener('click', () => {
+          document.getElementById('layout-select').value = 'default';
+          localStorage.setItem('layout', 'default');
+          toggleLayout('default');
+        });
+        document.body.appendChild(exitBtn);
+      } else {
+        editorTerminalContainer.classList.add('flex');
+        editorContainer.classList.remove('fixed', 'inset-0', 'm-0', 'p-0');
+        editorContainer.style.width = '';
+        editorContainer.style.height = '';
+        terminalContainer.classList.remove('floating-terminal');
+        terminalContainer.style.width = '';
+        terminalContainer.style.height = '';
+        terminalContainer.style.left = '';
+        terminalContainer.style.top = '';
+        resizer.style.display = '';
+      }
+      editor.refresh();
+    };
+
+    document.getElementById('layout-select').addEventListener('change', (e) => {
+      const mode = e.target.value;
+      localStorage.setItem('layout', mode);
+      toggleLayout(mode);
+    });
+
+    // Initialize Settings
+    applySettings();
+  </script>
+</body>
+</html>
