@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codeer.org - Online Compiler</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
+  <!-- CodeMirror Language Modes -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/clike/clike.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/ruby/ruby.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/php/php.min.js"></script>
+  <!-- Additional Modes for C#, Kotlin (basic support) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/clike/clike.min.js" data-mode="csharp"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/clike/clike.min.js" data-mode="kotlin"></script>
+  <!-- CodeMirror Themes -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/monokai.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/dracula.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/solarized.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/nord.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/cobalt.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/blackboard.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/mdn-like.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #10b981;
+      --primary-dark: #059669;
+      --primary-light: #a7f3d0;
+      --dark: #1e293b;
+      --darker: #0f172a;
+      --light: #f8fafc;
+      --gray: #94a3b8;
+      --dark-gray: #334155;
+    }
+    
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--darker), var(--dark));
+      color: var(--light);
+      overflow-x: hidden;
+      height: 100vh;
+    }
+    
+    #landing-page, #compiler-page {
+      min-height: 100vh;
+    }
+    
+    .glass-card {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .glass-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      margin-bottom: 1rem;
+    }
+    
+    #editor-container, #terminal-container {
+      background: var(--dark);
+      border: 1px solid var(--dark-gray);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    #editor-terminal-container {
+      height: calc(100vh - 265px);
+      min-height: 300px;
+    }
+    
+    /* Notes section styles */
+    #notes-container {
+      margin-top: 12px;
+      background: var(--dark);
+      border: 1px solid var(--dark-gray);
+      border-radius: 12px;
+      overflow: hidden;
+      height: 150px;
+      position: relative;
+      transition: height 0.3s ease;
+    }
+    
+    #notes-container.collapsed {
+      height: 38px;
+    }
+    
+    .notes-header {
+      background-color: var(--dark-gray);
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+    
+    .notes-header h3 {
+      margin: 0;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      color: var(--primary-light);
+    }
+    
+    .notes-header h3 i {
+      margin-right: 8px;
+    }
+    
+    .notes-content {
+      padding: 0;
+      height: calc(100% - 38px);
+    }
+    
+    #notes-editor {
+      width: 100%;
+      height: 100%;
+      background: var(--darker);
+      color: #e06c75;
+      padding: 8px;
+      border: none;
+      resize: none;
+      font-family: 'Fira Code', monospace;
+      outline: none;
+      font-size: 14px;
+    }
+    
+    .resizer {
+      background: var(--dark-gray);
+      cursor: col-resize;
+      width: 8px;
+      transition: background 0.2s;
+      border-radius: 4px;
+    }
+    
+    .resizer:hover {
+      background: var(--primary);
+    }
+    
+    .floating-terminal {
+      position: absolute;
+      background: var(--dark);
+      border: 1px solid var(--dark-gray);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      resize: both;
+      overflow: auto;
+      min-width: 300px;
+      min-height: 200px;
+      z-index: 10;
+    }
+    
+    .settings-modal {
+      background: var(--dark);
+      border-radius: 12px;
+      border: 1px solid var(--dark-gray);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 90%;
+    }
+    
+    .tab-btn {
+      transition: all 0.2s ease;
+    }
+    
+    .tab-btn.active {
+      background-color: var(--primary) !important;
+    }
+    
+    .cm-editor {
+      height: 100%;
+      border-radius: 12px;
+    }
+    
+    /* Add line indentation guides */
+    .cm-lineIndent {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background-color: rgba(255, 255, 255, 0.05);
+      position: absolute;
+    }
+    
+    /* Add more padding at the bottom of editor for better visibility */
+    .CodeMirror-lines {
+      padding: 8px 0 150px 0; /* Extra bottom padding to allow scrolling beyond the last line */
+    }
+    
+    /* Highlight the active line more visibly */
+    .CodeMirror-activeline-background {
+      background: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    /* Improve scrollbar styling */
+    .CodeMirror-vscrollbar::-webkit-scrollbar {
+      width: 10px;
+    }
+    
+    .CodeMirror-vscrollbar::-webkit-scrollbar-track {
+      background: var(--dark);
+      border-radius: 8px;
+    }
+    
+    .CodeMirror-vscrollbar::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 8px;
+      border: 2px solid var(--dark);
+    }
+    
+    #compiler-page {
+      height: 100%;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      border: none;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    
+    .btn-secondary {
+      background: var(--dark-gray);
+      color: white;
+      border: none;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-secondary:hover {
+      background: var(--gray);
+      transform: translateY(-2px);
+    }
+    
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      border: none;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+    
+    .btn-info {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      border: none;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-info:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    
+    .language-select {
+      background: var(--dark);
+      color: white;
+      border: 1px solid var(--dark-gray);
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1rem;
+    }
+    
+    .language-select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    
+    .slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: var(--dark-gray);
+      outline: none;
+    }
+    
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .slider::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+    }
+    
+    .window {
+      position: relative;
+      height: 200px;
+      width: 300px;
+      background-color: var(--dark);
+      border: 2px solid var(--dark-gray);
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    
+    .window-title {
+      height: 30px;
+      background-color: var(--dark-gray);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+    }
+    
+    .window-title p {
+      color: var(--light);
+      font-weight: bold;
+      margin: 0;
+      text-align: left;
+    }
+    
+    .window-buttons {
+      display: flex;
+      align-items: center;
+    }
+    
+    .window-button {
+      width: 12px;
+      height: 12px;
+      border-radius: 6px;
+      margin: 5px;
+      transition: all 0.2s ease;
+    }
+    
+    .window-button.close {
+      background-color: #f56565;
+    }
+    
+    .window-button.close:hover {
+      background-color: #c53030;
+      cursor: pointer;
+    }
+    
+    .window-button.reduce {
+      background-color: #ecc94b;
+    }
+    
+    .window-button.reduce:hover {
+      background-color: #b7791f;
+      cursor: pointer;
+    }
+    
+    .window-button.fullscreen {
+      background-color: var(--primary);
+    }
+    
+    .window-button.fullscreen:hover {
+      background-color: var(--primary-dark);
+      cursor: pointer;
+    }
+    
+    .console {
+      width: 100%;
+      height: calc(100% - 30px);
+      background-color: var(--darker);
+      color: var(--light);
+      overflow: auto;
+      padding: 1rem;
+    }
+    
+    .console pre {
+      margin: 0;
+      font-size: 14px;
+    }
+    
+    .console pre code {
+      color: var(--primary-light);
+      outline: none;
+    }
+    
+    .console::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .console::-webkit-scrollbar-track {
+      background-color: var(--dark-gray);
+    }
+    
+    .console::-webkit-scrollbar-thumb {
+      background-color: var(--primary);
+      border-radius: 10px;
+      border: 2px solid var(--dark-gray);
+    }
+    
+    .console::-webkit-scrollbar-thumb:hover {
+      background-color: var(--primary-dark);
+    }
+    
+    .hero-gradient {
+      background: linear-gradient(135deg, var(--darker), var(--dark), var(--primary-dark));
+      background-size: 200% 200%;
+      animation: gradient 8s ease infinite;
+    }
+    
+    @keyframes gradient {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+    
+    .typewriter {
+      overflow: hidden;
+      border-right: 2px solid var(--primary);
+      white-space: nowrap;
+      margin: 0 auto;
+      letter-spacing: 0.15em;
+      animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+    }
+    
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+    
+    @keyframes blink-caret {
+      from, to { border-color: transparent }
+      50% { border-color: var(--primary) }
+    }
+    
+    .floating {
+      animation: floating 6s ease-in-out infinite;
+    }
+    
+    @keyframes floating {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      }
+      70% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+      }
+    }
+
+    /* Language Cards */
+    .language-card {
+      background-color: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      height: 100px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    
+    .language-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary);
+      box-shadow: 0 8px 32px rgba(16, 185, 129, 0.2);
+    }
+    
+    .language-card i {
+      transition: all 0.3s ease;
+    }
+    
+    .language-card:hover i {
+      transform: scale(1.2);
+    }
+    
+    .code-typing {
+      overflow: hidden;
+      position: relative;
+      font-family: 'Fira Code', monospace;
+    }
+    
+    .code-typing::after {
+      content: "|";
+      position: absolute;
+      right: 0;
+      color: var(--primary);
+      background-color: var(--darker);
+      animation: typing-cursor 0.8s infinite;
+    }
+    
+    @keyframes typing-cursor {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    
+    /* Stats counter animation */
+    .counter-value {
+      transition: all 0.3s ease;
+    }
+    
+    /* Added styles for navigation */
+    .nav-link {
+      position: relative;
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -4px;
+      left: 0;
+      background-color: var(--primary);
+      transition: width 0.3s ease;
+    }
+    
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    
+    @media (max-width: 768px) {
+      #editor-container, #terminal-container {
+        width: 100% !important;
+        height: auto !important;
+        min-height: 300px;
+      }
+      #editor-terminal-container {
+        flex-direction: column !important;
+        height: auto !important;
+      }
+      .resizer {
+        display: none;
+      }
+      .tab-btn {
+        padding: 0.5rem !important;
+        font-size: 0.875rem;
+      }
+      .settings-modal {
+        width: 95% !important;
+        padding: 0.75rem !important;
+      }
+      #compiler-page {
+        padding: 0.5rem !important;
+      }
+      .floating-terminal {
+        width: 90% !important;
+        left: 5% !important;
+        height: 40% !important;
+      }
+      .fixed-run-btn {
+        bottom: 1rem !important;
+        right: 1rem !important;
+        padding: 0.5rem 1rem !important;
+      }
+      .exit-classroom-btn {
+        top: 1rem !important;
+        right: 1rem !important;
+        padding: 0.25rem 0.75rem !important;
+        font-size: 0.875rem !important;
+      }
+      /* Improve nav button layout */
+      .flex.gap-2.flex-wrap {
+        justify-content: center;
+      }
+      /* Make settings panels scrollable */
+      .tab-content {
+        max-height: 70vh;
+        overflow-y: auto;
+      }
+      /* Adjust previous outputs section */
+      #previous-outputs-list {
+        max-height: 40vh;
+      }
+      /* Improve notes container */
+      #notes-container {
+        height: 120px;
+      }
+      #notes-container.collapsed {
+        height: 38px;
+      }
+      .container {
+        transform: none;
+      }
+      /* Make mobile touch-friendly */
+      button, select, .tab-btn, .language-select {
+        min-height: 44px;
+        min-width: 44px;
+      }
+      /* Make slider thumbs larger for touch */
+      .slider::-webkit-slider-thumb {
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    /* Additional media query for very small screens */
+    @media (max-width: 480px) {
+      #editor-terminal-container {
+        gap: 0.5rem !important;
+      }
+      .btn-primary, .btn-secondary, .btn-info, .btn-danger {
+        padding: 0.375rem 0.75rem !important;
+        font-size: 0.875rem !important;
+      }
+      .glass-card {
+        padding: 1rem !important;
+      }
+      h1 {
+        font-size: 1.75rem !important;
+      }
+      h2 {
+        font-size: 1.5rem !important;
+      }
+      h3 {
+        font-size: 1.25rem !important;
+      }
+      .feature-icon {
+        width: 36px;
+        height: 36px;
+      }
+      .notes-header h3, .previous-output-header h3 {
+        font-size: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Landing Page -->
+  <div id="landing-page" class="flex flex-col">
+    <!-- Navigation -->
+    <nav class="bg-darker bg-opacity-80 backdrop-blur-md py-4 px-6 sticky top-0 z-50 shadow-md">
+      <div class="container mx-auto flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-code text-primary text-2xl"></i>
+          <span class="text-xl font-bold text-white">codeer<span class="text-primary">.org</span></span>
+        </div>
+        <div class="hidden md:flex space-x-6 items-center">
+          <a href="#features" class="text-gray-300 hover:text-white nav-link">Features</a>
+          <a href="#languages" class="text-gray-300 hover:text-white nav-link">Languages</a>
+          <a href="#freetools" class="text-gray-300 hover:text-white nav-link">Free Tools</a>
+          <button id="nav-start-coding" class="btn-primary py-2 px-4 rounded-lg text-sm font-semibold">
+            Start Coding
+          </button>
+        </div>
+        <button class="md:hidden text-gray-300 hover:text-white">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="py-16 px-4 bg-darker relative overflow-hidden" id="hero">
+      <!-- Animated background elements -->
+      <div class="absolute inset-0 opacity-20">
+        <div class="absolute top-10 left-10 w-20 h-20 rounded-full bg-primary" style="filter: blur(60px);"></div>
+        <div class="absolute top-40 right-20 w-32 h-32 rounded-full bg-blue-500" style="filter: blur(80px);"></div>
+        <div class="absolute bottom-10 left-1/3 w-40 h-40 rounded-full bg-purple-500" style="filter: blur(90px);"></div>
+      </div>
+      
+      <div class="container mx-auto relative z-10">
+        <div class="flex flex-col-reverse md:flex-row items-center gap-8 md:gap-16">
+          <!-- Left Content -->
+          <div class="md:w-1/2 text-center md:text-left">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-200">
+              Code. Compile.<br>
+              <span class="text-primary">Execute.</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-300 mb-8">
+              The ultimate free online IDE for developers and students
+            </p>
+            <div class="flex flex-wrap gap-4 justify-center md:justify-start">
+              <button id="start-coding" class="btn-primary py-3 px-8 rounded-lg text-lg font-semibold pulse">
+                <i class="fas fa-play mr-2"></i> Start Coding Now
+              </button>
+              <a href="#languages" class="btn-secondary py-3 px-8 rounded-lg text-lg font-semibold">
+                <i class="fas fa-code mr-2"></i> Explore Languages
+              </a>
+            </div>
+            
+            <!-- Stats -->
+            <div class="mt-12 grid grid-cols-3 gap-4">
+              <div class="text-center">
+                <div class="text-3xl font-bold text-primary counter-value" data-target="20">0</div>
+                <div class="text-sm text-gray-400">Languages</div>
+              </div>
+              <div class="text-center">
+                <div class="text-3xl font-bold text-primary counter-value" data-target="100">0</div>
+                <div class="text-sm text-gray-400">% Free</div>
+              </div>
+              <div class="text-center">
+                <div class="text-3xl font-bold text-primary counter-value" data-target="10000">0</div>
+                <div class="text-sm text-gray-400">Daily Users</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right Content: Code Editor Window -->
+          <div class="md:w-1/2 w-full">
+            <div class="editor-window glass-card p-0 overflow-hidden">
+              <div class="bg-darker py-2 px-4 flex items-center justify-between border-b border-gray-800">
+                <div class="flex items-center">
+                  <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                  <div class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
+                  <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                  <span class="text-gray-400 text-sm ml-2">main.py</span>
+                </div>
+                <div>
+                  <span class="text-gray-400 text-xs">Python</span>
+                </div>
+              </div>
+              <div class="p-6 bg-darker font-mono text-sm leading-relaxed code-typing">
+                <div class="text-gray-500"># Welcome to Codeer.org</div>
+                <div class="text-purple-400">def <span class="text-yellow-300">say_hello</span>():</div>
+                <div class="ml-4 text-green-400">"The ultimate online compiler"</div>
+                <div class="ml-4 text-blue-400">print<span class="text-white">(</span><span class="text-green-400">"Hello, Developer!"</span><span class="text-white">)</span></div>
+                <div class="ml-4 text-blue-400">print<span class="text-white">(</span><span class="text-green-400">"Start coding now..."</span><span class="text-white">)</span></div>
+                <div></div>
+                <div class="text-blue-400">if <span class="text-white">__name__ == </span><span class="text-green-400">"__main__"</span><span class="text-white">:</span></div>
+                <div class="ml-4 text-yellow-300">say_hello<span class="text-white">()</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Language Showcase -->
+    <section class="py-12 px-6 bg-dark relative" id="languages">
+      <div class="container mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold text-center mb-2">Supported Languages</h2>
+        <p class="text-xl text-gray-400 text-center mb-12">Code in your favorite programming language</p>
+        
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-4">
+          <!-- JavaScript -->
+          <div class="language-card">
+            <i class="fab fa-js text-yellow-400 text-3xl mb-2"></i>
+            <span class="text-sm">JavaScript</span>
+          </div>
+          
+          <!-- Python -->
+          <div class="language-card">
+            <i class="fab fa-python text-blue-400 text-3xl mb-2"></i>
+            <span class="text-sm">Python</span>
+          </div>
+          
+          <!-- Java -->
+          <div class="language-card">
+            <i class="fab fa-java text-orange-500 text-3xl mb-2"></i>
+            <span class="text-sm">Java</span>
+          </div>
+          
+          <!-- C++ -->
+          <div class="language-card">
+            <i class="fas fa-code text-blue-500 text-3xl mb-2"></i>
+            <span class="text-sm">C++</span>
+          </div>
+          
+          <!-- PHP -->
+          <div class="language-card">
+            <i class="fab fa-php text-indigo-400 text-3xl mb-2"></i>
+            <span class="text-sm">PHP</span>
+          </div>
+          
+          <!-- C# -->
+          <div class="language-card">
+            <i class="fas fa-hashtag text-green-500 text-3xl mb-2"></i>
+            <span class="text-sm">C#</span>
+          </div>
+          
+          <!-- Ruby -->
+          <div class="language-card">
+            <i class="fas fa-gem text-red-500 text-3xl mb-2"></i>
+            <span class="text-sm">Ruby</span>
+          </div>
+          
+          <!-- Go -->
+          <div class="language-card">
+            <span class="text-blue-400 text-3xl mb-0 font-bold">Go</span>
+            <span class="text-sm">Golang</span>
+          </div>
+          
+          <!-- TypeScript -->
+          <div class="language-card">
+            <span class="text-blue-500 text-3xl mb-0 font-bold">TS</span>
+            <span class="text-sm">TypeScript</span>
+          </div>
+          
+          <!-- Kotlin -->
+          <div class="language-card">
+            <span class="text-purple-500 text-3xl mb-0 font-bold">Kt</span>
+            <span class="text-sm">Kotlin</span>
+          </div>
+          
+          <!-- Swift -->
+          <div class="language-card">
+            <i class="fab fa-swift text-orange-500 text-3xl mb-2"></i>
+            <span class="text-sm">Swift</span>
+          </div>
+          
+          <!-- Rust -->
+          <div class="language-card">
+            <span class="text-orange-600 text-3xl mb-0 font-bold">Ru</span>
+            <span class="text-sm">Rust</span>
+          </div>
+          
+          <!-- SQL -->
+          <div class="language-card">
+            <i class="fas fa-database text-blue-300 text-3xl mb-2"></i>
+            <span class="text-sm">SQL</span>
+          </div>
+          
+          <!-- And More Button -->
+          <div class="language-card bg-primary bg-opacity-20 border-primary">
+            <i class="fas fa-ellipsis-h text-primary text-3xl mb-2"></i>
+            <span class="text-sm">And More</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-16 px-4 bg-darker relative" id="features">
+      <div class="container mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold text-center text-white mb-4">Why Choose Codeer.org?</h2>
+        <p class="text-xl text-gray-400 text-center max-w-3xl mx-auto mb-12">
+          A powerful online IDE designed for developers of all skill levels
+        </p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="glass-card p-6 flex flex-col items-start">
+            <div class="feature-icon">
+              <i class="fas fa-language text-xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-2">Multi-Language Support</h3>
+            <p class="text-gray-300">Compile code in Python, JavaScript, Java, and more with Judge0 API.</p>
+          </div>
+          <div class="glass-card p-6 flex flex-col items-start">
+            <div class="feature-icon">
+              <i class="fas fa-expand-alt text-xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-2">Resizable Interface</h3>
+            <p class="text-gray-300">Drag borders to customize your coding and terminal areas.</p>
+          </div>
+          <div class="glass-card p-6 flex flex-col items-start">
+            <div class="feature-icon">
+              <i class="fas fa-palette text-xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-2">Personalized UI</h3>
+            <p class="text-gray-300">Adjust UI size, font, and pick from 9+ stunning themes.</p>
+          </div>
+          <div class="glass-card p-6 flex flex-col items-start">
+            <div class="feature-icon">
+              <i class="fas fa-chalkboard-teacher text-xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-2">Classroom Mode</h3>
+            <p class="text-gray-300">Full-screen coding with a floating, resizable terminal.</p>
+          </div>
+          <div class="glass-card p-6 flex flex-col items-start">
+            <div class="feature-icon">
+              <i class="fas fa-code-branch text-xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-2">Code Management</h3>
+            <p class="text-gray-300">Easily copy, delete, download, or run your code.</p>
+          </div>
+          <div class="glass-card p-6 flex flex-col items-start">
+            <div class="feature-icon">
+              <i class="fas fa-gift text-xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-2">Completely Free</h3>
+            <p class="text-gray-300">Access all features at no cost, forever.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Free Offerings Section -->
+    <section class="py-16 px-4 bg-gradient-to-b from-dark to-darker" id="freetools">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold text-center text-white mb-8">What You Get for Free</h2>
+        <div class="glass-card p-8">
+          <ul class="space-y-4 text-gray-300 text-lg">
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-primary mr-3 mt-1"></i>
+              <span>Unlimited code compilation across all supported languages</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-primary mr-3 mt-1"></i>
+              <span>Access to 9+ editor themes and customizable layouts</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-primary mr-3 mt-1"></i>
+              <span>Resizable coding and terminal areas, plus classroom view mode</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-primary mr-3 mt-1"></i>
+              <span>Seamless code copy, delete, and download functionalities</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-primary mr-3 mt-1"></i>
+              <span>Multi-file support with language-specific syntax highlighting</span>
+            </li>
+          </ul>
+          
+          <!-- CTA Button -->
+          <div class="mt-8 text-center">
+            <button id="free-start-coding" class="btn-primary py-3 px-8 rounded-lg text-lg font-semibold">
+              <i class="fas fa-rocket mr-2"></i> Try it Now - No Sign Up Needed
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 text-center bg-darker">
+      <div class="max-w-6xl mx-auto">
+        <div class="flex justify-center space-x-6 mb-6">
+          <a href="#" class="text-gray-400 hover:text-primary transition">
+            <i class="fab fa-github text-2xl"></i>
+          </a>
+          <a href="#" class="text-gray-400 hover:text-primary transition">
+            <i class="fab fa-twitter text-2xl"></i>
+          </a>
+          <a href="#" class="text-gray-400 hover:text-primary transition">
+            <i class="fab fa-discord text-2xl"></i>
+          </a>
+          <a href="#" class="text-gray-400 hover:text-primary transition">
+            <i class="fab fa-linkedin text-2xl"></i>
+          </a>
+        </div>
+        <p class="text-gray-400 mb-4">© 2025 Codeer.org. All rights reserved.</p>
+        <div class="flex justify-center space-x-6">
+          <a href="#" class="text-gray-400 hover:text-primary transition">About</a>
+          <a href="#" class="text-gray-400 hover:text-primary transition">Contact</a>
+          <a href="#" class="text-gray-400 hover:text-primary transition">Privacy Policy</a>
+          <a href="#" class="text-gray-400 hover:text-primary transition">Terms</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Compiler Page -->
+  <div id="compiler-page" class="hidden flex flex-col h-screen p-4">
+    <!-- Top Navigation Bar -->
+    <div class="flex flex-wrap items-center justify-between mb-4 gap-2 bg-darker p-3 rounded-lg shadow-lg">
+      <div class="flex items-center gap-2">
+        <select id="language-select" class="language-select">
+          <!-- Populated dynamically -->
+        </select>
+        
+        <!-- File tabs system -->
+        <div class="hidden md:flex items-center bg-dark rounded-lg ml-2 overflow-x-auto max-w-lg">
+          <div id="file-tabs" class="flex">
+            <div class="file-tab active px-3 py-2 text-sm flex items-center gap-1 cursor-pointer hover:bg-dark-gray rounded-l-lg">
+              <i class="fas fa-code text-primary"></i>
+              <span>main</span>
+              <i class="fas fa-times ml-2 text-xs hover:text-red-400"></i>
+            </div>
+          </div>
+          <button id="new-file-btn" class="px-3 py-2 text-gray-400 hover:text-white" title="New File">
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="flex gap-2 flex-wrap">
+        <button id="run-btn" class="btn-primary py-2 px-4 rounded-lg flex items-center shadow-lg hover:shadow-xl" title="Run Code (Ctrl+Enter)">
+          <i class="fas fa-play mr-2"></i> Run
+        </button>
+        <button id="copy-btn" class="btn-secondary py-2 px-4 rounded-lg flex items-center" title="Copy Code">
+          <i class="fas fa-copy mr-2"></i> <span class="hidden sm:inline">Copy</span>
+        </button>
+        <button id="delete-btn" class="btn-danger py-2 px-4 rounded-lg flex items-center" title="Delete Code">
+          <i class="fas fa-trash mr-2"></i> <span class="hidden sm:inline">Clear</span>
+        </button>
+        <button id="download-btn" class="btn-info py-2 px-4 rounded-lg flex items-center" title="Download Code">
+          <i class="fas fa-download mr-2"></i> <span class="hidden sm:inline">Save</span>
+        </button>
+        <button id="share-btn" class="btn-secondary bg-purple-600 hover:bg-purple-700 py-2 px-4 rounded-lg flex items-center" title="Share Code">
+          <i class="fas fa-share-alt mr-2"></i> <span class="hidden sm:inline">Share</span>
+        </button>
+        <button id="settings-btn" class="btn-secondary py-2 px-4 rounded-lg flex items-center" title="Settings">
+          <i class="fas fa-cog mr-2"></i> <span class="hidden sm:inline">Settings</span>
+        </button>
+      </div>
+    </div>
+    
+    <div id="editor-terminal-container" class="flex flex-1 overflow-hidden h-full gap-4">
+      <div id="editor-container" class="flex-1 h-full relative rounded-lg overflow-hidden shadow-xl">
+        <!-- Editor loading indicator -->
+        <div id="editor-loading" class="absolute inset-0 bg-darker bg-opacity-75 flex items-center justify-center z-10 hidden">
+          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+        <textarea id="code-editor"></textarea>
+      </div>
+      <div class="resizer" id="resizer"></div>
+      <div id="terminal-container" class="flex-1 relative h-full rounded-lg overflow-hidden shadow-xl flex flex-col">
+        <div class="terminal-header bg-darker p-2 flex justify-between items-center border-b border-dark-gray">
+          <div class="flex items-center">
+            <i class="fas fa-terminal text-primary mr-2"></i>
+            <span class="text-sm font-semibold">Console Output</span>
+          </div>
+          <div class="flex gap-2">
+            <button id="clear-terminal" class="text-gray-400 hover:text-white text-sm" title="Clear Terminal">
+              <i class="fas fa-broom"></i>
+            </button>
+            <button id="hide-terminal" class="text-gray-400 hover:text-white text-sm" title="Hide Terminal">
+              <i class="fas fa-eye-slash"></i>
+            </button>
+          </div>
+        </div>
+        <div class="terminal-body flex-1 overflow-auto">
+          <pre id="terminal-output" class="p-4 text-gray-200 h-full font-mono"></pre>
+        </div>
+        <!-- Terminal loading indicator -->
+        <div id="terminal-loading" class="absolute inset-0 bg-darker bg-opacity-75 flex flex-col items-center justify-center z-10 hidden">
+          <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary mb-3"></div>
+          <p class="text-primary">Running...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Previous Output Section -->
+    <div id="previous-output-container" class="mt-4">
+      <div class="previous-output-header bg-darker p-2 flex justify-between items-center border-b border-dark-gray rounded-t-lg cursor-pointer">
+        <div class="flex items-center">
+          <i class="fas fa-history text-primary mr-2"></i>
+          <span class="text-sm font-semibold">Previous Outputs</span>
+          <span id="output-count" class="text-xs bg-primary text-white rounded-full px-2 py-0.5 ml-2">0</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="clear-all-outputs" class="text-gray-400 hover:text-white text-sm" title="Clear All Outputs">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+          <i id="toggle-previous" class="fas fa-chevron-down text-gray-400"></i>
+        </div>
+      </div>
+      <div id="previous-outputs-content" class="bg-dark border border-dark-gray border-t-0 rounded-b-lg overflow-hidden">
+        <div id="previous-outputs-list" class="overflow-y-auto max-h-64">
+          <!-- Previous outputs will be added here dynamically -->
+          <div class="empty-state p-4 text-center text-gray-400">
+            <i class="fas fa-code text-5xl mb-2"></i>
+            <p>Run your code to see outputs here</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes Section -->
+    <div id="notes-container" class="mt-4">
+      <div class="notes-header bg-darker p-2 flex justify-between items-center border-b border-dark-gray rounded-t-lg cursor-pointer">
+        <div class="flex items-center">
+          <i class="fas fa-sticky-note text-primary mr-2"></i>
+          <span class="text-sm font-semibold">Notes</span>
+        </div>
+        <i class="fas fa-chevron-down text-gray-400"></i>
+      </div>
+      <div class="notes-content bg-dark border border-dark-gray border-t-0 rounded-b-lg">
+        <textarea id="notes-editor" class="w-full p-4 bg-dark text-gray-200 border-none resize-none focus:outline-none font-mono" placeholder="Write your notes here..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="settings-modal p-6">
+      <div class="flex mb-4 overflow-x-auto gap-1">
+        <button class="tab-btn bg-primary text-white py-2 px-4 rounded-t" id="general-tab-btn" data-tab="general">
+          <i class="fas fa-cog mr-2"></i> General
+        </button>
+        <button class="tab-btn bg-dark-gray text-white py-2 px-4 rounded-t" id="appearance-tab-btn" data-tab="appearance">
+          <i class="fas fa-paint-brush mr-2"></i> Appearance
+        </button>
+        <button class="tab-btn bg-dark-gray text-white py-2 px-4 rounded-t" id="layout-tab-btn" data-tab="layout">
+          <i class="fas fa-columns mr-2"></i> Layout
+        </button>
+        <button class="tab-btn bg-dark-gray text-white py-2 px-4 rounded-t" id="keyboard-tab-btn" data-tab="keyboard">
+          <i class="fas fa-keyboard mr-2"></i> Shortcuts
+        </button>
+      </div>
+      <div id="general-tab" class="tab-content">
+        <h3 class="text-xl font-semibold text-white mb-4">
+          <i class="fas fa-cog mr-2 text-primary"></i> General Settings
+        </h3>
+        <div class="mt-4">
+          <label class="block text-gray-300 mb-2">UI Size</label>
+          <input id="ui-size-slider" type="range" min="80" max="120" value="100" class="slider">
+          <span id="ui-size-value" class="text-gray-300 block mt-2">100%</span>
+        </div>
+        <div class="mt-6">
+          <label class="block text-gray-300 mb-2">Font Size</label>
+          <input id="font-size-slider" type="range" min="12" max="24" value="16" class="slider">
+          <span id="font-size-value" class="text-gray-300 block mt-2">16px</span>
+        </div>
+        <div class="mt-6">
+          <label class="block text-gray-300 mb-2">Auto Save</label>
+          <div class="flex items-center">
+            <label class="inline-flex items-center">
+              <input type="checkbox" id="auto-save" class="form-checkbox h-5 w-5 text-primary bg-dark border-dark-gray rounded">
+              <span class="ml-2 text-gray-300">Enable auto save</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div id="appearance-tab" class="tab-content hidden">
+        <h3 class="text-xl font-semibold text-white mb-4">
+          <i class="fas fa-paint-brush mr-2 text-primary"></i> Appearance Settings
+        </h3>
+        <div class="mt-4">
+          <label class="block text-gray-300 mb-2">Editor Theme</label>
+          <select id="theme-select" class="language-select">
+            <option value="monokai">Monokai</option>
+            <option value="dracula">Dracula</option>
+            <option value="solarized-dark">Solarized Dark</option>
+            <option value="nord">Nord</option>
+            <option value="cobalt">Cobalt</option>
+            <option value="blackboard">Blackboard</option>
+            <option value="mdn-like">MDN Like</option>
+            <option value="gruvbox-dark">Gruvbox Dark</option>
+            <option value="tokyo-night">Tokyo Night</option>
+          </select>
+        </div>
+        <div class="mt-4">
+          <label class="block text-gray-300 mb-2">Line Numbers</label>
+          <div class="flex items-center">
+            <label class="inline-flex items-center">
+              <input type="checkbox" id="line-numbers" checked class="form-checkbox h-5 w-5 text-primary bg-dark border-dark-gray rounded">
+              <span class="ml-2 text-gray-300">Show line numbers</span>
+            </label>
+          </div>
+        </div>
+        <div class="mt-4">
+          <label class="block text-gray-300 mb-2">Word Wrap</label>
+          <div class="flex items-center">
+            <label class="inline-flex items-center">
+              <input type="checkbox" id="word-wrap" checked class="form-checkbox h-5 w-5 text-primary bg-dark border-dark-gray rounded">
+              <span class="ml-2 text-gray-300">Enable word wrap</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div id="layout-tab" class="tab-content hidden">
+        <h3 class="text-xl font-semibold text-white mb-4">
+          <i class="fas fa-columns mr-2 text-primary"></i> Layout Settings
+        </h3>
+        <div class="mt-4">
+          <label class="block text-gray-300 mb-2">Layout Mode</label>
+          <select id="layout-select" class="language-select">
+            <option value="default">Default (Split View)</option>
+            <option value="classroom">Classroom View</option>
+            <option value="editor-focus">Editor Focus</option>
+          </select>
+          <p class="text-xs text-gray-400 mt-2">
+            <span class="font-semibold">Default:</span> Split view with editor and terminal side by side.<br>
+            <span class="font-semibold">Classroom:</span> Full screen editor with floating terminal.<br>
+            <span class="font-semibold">Editor Focus:</span> Only shows editor, terminal appears on run.
+          </p>
+        </div>
+        <div class="mt-6">
+          <label class="block text-gray-300 mb-2">Terminal Position</label>
+          <select id="terminal-position" class="language-select">
+            <option value="right">Right (Side by Side)</option>
+            <option value="bottom">Bottom (Stacked)</option>
+          </select>
+        </div>
+        <div class="mt-6">
+          <label class="block text-gray-300 mb-2">Terminal Split Size</label>
+          <input id="terminal-size-slider" type="range" min="10" max="90" value="50" class="slider">
+          <span id="terminal-size-value" class="text-gray-300 block mt-2">50%</span>
+        </div>
+      </div>
+      <div id="keyboard-tab" class="tab-content hidden">
+        <h3 class="text-xl font-semibold text-white mb-4">
+          <i class="fas fa-keyboard mr-2 text-primary"></i> Keyboard Shortcuts
+        </h3>
+        <div class="mt-4 bg-darker p-3 rounded-lg max-h-60 overflow-y-auto">
+          <table class="w-full text-left text-gray-300 text-sm">
+            <tbody>
+              <tr class="border-b border-dark-gray">
+                <td class="py-2 font-semibold">Run Code</td>
+                <td class="py-2 text-right"><kbd class="px-2 py-1 bg-dark-gray rounded">Ctrl + Enter</kbd></td>
+              </tr>
+              <tr class="border-b border-dark-gray">
+                <td class="py-2 font-semibold">Save/Download Code</td>
+                <td class="py-2 text-right"><kbd class="px-2 py-1 bg-dark-gray rounded">Ctrl + S</kbd></td>
+              </tr>
+              <tr class="border-b border-dark-gray">
+                <td class="py-2 font-semibold">Copy Code</td>
+                <td class="py-2 text-right"><kbd class="px-2 py-1 bg-dark-gray rounded">Ctrl + Shift + C</kbd></td>
+              </tr>
+              <tr class="border-b border-dark-gray">
+                <td class="py-2 font-semibold">Toggle Terminal</td>
+                <td class="py-2 text-right"><kbd class="px-2 py-1 bg-dark-gray rounded">Ctrl + `</kbd></td>
+              </tr>
+              <tr class="border-b border-dark-gray">
+                <td class="py-2 font-semibold">Open Settings</td>
+                <td class="py-2 text-right"><kbd class="px-2 py-1 bg-dark-gray rounded">Ctrl + ,</kbd></td>
+              </tr>
+              <tr class="border-b border-dark-gray">
+                <td class="py-2 font-semibold">Cycle Layout</td>
+                <td class="py-2 text-right"><kbd class="px-2 py-1 bg-dark-gray rounded">Ctrl + L</kbd></td>
+              </tr>
+              <tr class="border-b border-dark-gray">
+                <td class="py-2 font-semibold">Clear Terminal</td>
+                <td class="py-2 text-right"><kbd class="px-2 py-1 bg-dark-gray rounded">Ctrl + K</kbd></td>
+              </tr>
+              <tr class="border-b border-dark-gray">
+                <td class="py-2 font-semibold">Indent Code</td>
+                <td class="py-2 text-right"><kbd class="px-2 py-1 bg-dark-gray rounded">Tab</kbd></td>
+              </tr>
+              <tr>
+                <td class="py-2 font-semibold">Outdent Code</td>
+                <td class="py-2 text-right"><kbd class="px-2 py-1 bg-dark-gray rounded">Shift + Tab</kbd></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="flex gap-2 mt-6">
+        <button id="reset-settings" class="btn-secondary py-2 px-4 rounded flex-1">
+          <i class="fas fa-undo mr-2"></i> Reset
+        </button>
+        <button id="close-settings" class="btn-danger py-2 px-4 rounded flex-1">
+          <i class="fas fa-times mr-2"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share Modal -->
+  <div id="share-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="settings-modal p-6 max-w-lg">
+      <h3 class="text-xl font-semibold text-white mb-4">
+        <i class="fas fa-share-alt mr-2 text-purple-500"></i> Share Your Code
+      </h3>
+      <div class="mt-4">
+        <label class="block text-gray-300 mb-2">Code Link</label>
+        <div class="flex gap-2">
+          <input type="text" id="share-link" readonly class="bg-darker text-gray-300 py-2 px-3 rounded-lg w-full" value="https://codeer.org/s/abc123">
+          <button id="copy-link" class="btn-secondary py-2 px-4 rounded-lg">
+            <i class="fas fa-copy"></i>
+          </button>
+        </div>
+      </div>
+      <div class="mt-6">
+        <label class="block text-gray-300 mb-2">Share on Social Media</label>
+        <div class="flex gap-3 justify-center mt-3">
+          <a href="#" class="bg-blue-600 hover:bg-blue-700 p-3 rounded-lg" title="Share on Twitter">
+            <i class="fab fa-twitter text-white text-xl"></i>
+          </a>
+          <a href="#" class="bg-blue-800 hover:bg-blue-900 p-3 rounded-lg" title="Share on Facebook">
+            <i class="fab fa-facebook-f text-white text-xl"></i>
+          </a>
+          <a href="#" class="bg-blue-500 hover:bg-blue-600 p-3 rounded-lg" title="Share on LinkedIn">
+            <i class="fab fa-linkedin-in text-white text-xl"></i>
+          </a>
+          <a href="#" class="bg-green-600 hover:bg-green-700 p-3 rounded-lg" title="Share on WhatsApp">
+            <i class="fab fa-whatsapp text-white text-xl"></i>
+          </a>
+        </div>
+      </div>
+      <div class="flex gap-2 mt-6">
+        <button id="close-share" class="btn-danger py-2 px-4 rounded w-full">
+          <i class="fas fa-times mr-2"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Welcome Code for Landing Page
+    const welcomeCodes = [
+      `print("Welcome to Codeer.org! Write your code here.") # Python`,
+      `console.log("Welcome to Codeer.org! Write your code here."); // JavaScript`,
+      `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Welcome to Codeer.org! Write your code here.");\n    }\n} // Java`,
+      `#include <stdio.h>\nint main() {\n    printf("Welcome to Codeer.org! Write your code here.\\n");\n    return 0;\n} // C`,
+    ];
+
+    // Type animation for the welcome code
+    let currentCodeIndex = 0;
+    let isErasing = false;
+    let charIndex = 0;
+    let typeTimeout;
+    const welcomeCodePre = document.getElementById('welcome-code');
+    
+    function typeCode() {
+      clearTimeout(typeTimeout);
+      
+      const currentCode = welcomeCodes[currentCodeIndex];
+      
+      if (!isErasing && charIndex <= currentCode.length) {
+        welcomeCodePre.innerHTML = currentCode.substring(0, charIndex) + '<span class="text-primary">|</span>';
+        charIndex++;
+        typeTimeout = setTimeout(typeCode, charIndex === currentCode.length ? 3000 : 50);
+      } else if (!isErasing && charIndex > currentCode.length) {
+        isErasing = true;
+        typeTimeout = setTimeout(typeCode, 1000);
+      } else if (isErasing && charIndex >= 0) {
+        welcomeCodePre.innerHTML = currentCode.substring(0, charIndex) + '<span class="text-primary">|</span>';
+        charIndex--;
+        typeTimeout = setTimeout(typeCode, 20);
+      } else if (isErasing && charIndex < 0) {
+        isErasing = false;
+        currentCodeIndex = (currentCodeIndex + 1) % welcomeCodes.length;
+        charIndex = 0;
+        typeTimeout = setTimeout(typeCode, 500);
+      }
+    }
+
+    // Stats counter animation
+    function animateCounters() {
+      document.querySelectorAll('.counter-value').forEach(counter => {
+        const target = +counter.getAttribute('data-target');
+        let count = 0;
+        const increment = Math.ceil(target / 70);
+        
+        function updateCount() {
+          if (count < target) {
+            count += increment;
+            counter.innerText = count > target ? target : count;
+            requestAnimationFrame(updateCount);
+          } else {
+            counter.innerText = target;
+          }
+        }
+        
+        updateCount();
+      });
+    }
+
+    // Mobile menu toggle
+    document.querySelector('.md\\:hidden').addEventListener('click', () => {
+      // Mobile menu implementation
+      const mobileMenu = document.createElement('div');
+      mobileMenu.className = 'fixed inset-0 bg-darker z-50 flex flex-col items-center justify-center';
+      mobileMenu.innerHTML = `
+        <button class="absolute top-4 right-6 text-white text-2xl">
+          <i class="fas fa-times"></i>
+        </button>
+        <div class="flex flex-col items-center gap-6 text-lg">
+          <a href="#features" class="text-white hover:text-primary">Features</a>
+          <a href="#languages" class="text-white hover:text-primary">Languages</a>
+          <a href="#freetools" class="text-white hover:text-primary">Free Tools</a>
+          <button class="btn-primary py-2 px-6 rounded-lg mt-4">Start Coding</button>
+        </div>
+      `;
+      document.body.appendChild(mobileMenu);
+      
+      // Close menu
+      mobileMenu.querySelector('button').addEventListener('click', () => {
+        document.body.removeChild(mobileMenu);
+      });
+      
+      // Menu links scroll
+      mobileMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          document.body.removeChild(mobileMenu);
+        });
+      });
+      
+      // Start coding button
+      mobileMenu.querySelector('.btn-primary').addEventListener('click', () => {
+        document.body.removeChild(mobileMenu);
+        navigateToCompilerPage();
+      });
+    });
+
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      });
+    });
+
+    // Navigate to compiler page
+    function navigateToCompilerPage() {
+      document.getElementById('landing-page').classList.add('hidden');
+      document.getElementById('compiler-page').classList.remove('hidden');
+      
+      // Initialize CodeMirror editor if needed
+      if (typeof editor === 'undefined' && typeof CodeMirror !== 'undefined') {
+        initializeEditor();
+      } else if (typeof editor !== 'undefined') {
+        editor.refresh();
+      }
+    }
+
+    // Initialize editor function
+    function initializeEditor() {
+      // This will be defined in your compiler page code
+      if (typeof CodeMirror !== 'undefined' && document.getElementById('code-editor')) {
+        editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
+          lineNumbers: true,
+          mode: 'javascript',
+          theme: 'monokai',
+          lineWrapping: true,
+          autofocus: true,
+          tabSize: 2,
+          matchBrackets: true,
+          autoCloseBrackets: true,
+          styleActiveLine: true,
+          indentUnit: 4
+        });
+      }
+    }
+
+    // Set up start coding buttons
+    document.querySelectorAll('#start-coding, #nav-start-coding, #free-start-coding').forEach(button => {
+      button.addEventListener('click', navigateToCompilerPage);
+    });
+
+    // Initialize animations and interactions on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      // Start counter animation when in viewport
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            animateCounters();
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.5 });
+      
+      const countersSection = document.querySelector('.counter-value');
+      if (countersSection) observer.observe(countersSection);
+      
+      // Language card hover effects
+      document.querySelectorAll('.language-card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+          card.style.transform = 'translateY(-10px)';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = '';
+        });
+      });
+      
+      // Code typing effect for the hero section
+      const codeTyping = document.querySelector('.code-typing');
+      if (codeTyping) {
+        let lines = codeTyping.querySelectorAll('div');
+        
+        // Start with all lines hidden except the first
+        for (let i = 1; i < lines.length; i++) {
+          lines[i].style.opacity = '0';
+          lines[i].style.transform = 'translateY(10px)';
+          lines[i].style.transition = 'all 0.3s ease';
+        }
+        
+        let currentLine = 0;
+        
+        function revealNextLine() {
+          if (currentLine < lines.length) {
+            lines[currentLine].style.opacity = '1';
+            lines[currentLine].style.transform = 'translateY(0)';
+            currentLine++;
+            setTimeout(revealNextLine, 200);
+          }
+        }
+        
+        // Start the animation after a short delay
+        setTimeout(revealNextLine, 500);
+      }
+      
+      // Add a glow effect to CTA buttons on hover
+      document.querySelectorAll('.btn-primary').forEach(btn => {
+        btn.addEventListener('mouseenter', () => {
+          btn.style.boxShadow = '0 0 15px rgba(16, 185, 129, 0.5)';
+        });
+        
+        btn.addEventListener('mouseleave', () => {
+          btn.style.boxShadow = '';
+        });
+      });
+    });
+  </script>
+</body>
+</html>
